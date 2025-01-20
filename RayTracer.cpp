@@ -32,28 +32,30 @@ colour traceRay(
 	int depth
 );
 
-void renderScene();
+void render(int totalThreadCount, int threadNum);
 
 double infinity = std::numeric_limits<double>::infinity();
 double small_amount = 0.000001;
 double max_depth = 10;
 
+const int width = 600;
+const int height = 600;
+
+// Define the camera and canvas
+vec3 O = vec3(0.0, 0.0, 0.0);
+double d = 1.0; // z-axis distance from camera to canvas
+pixelmap pm(width, height);
+
+int pixel_samples = 10;
+double pixel_sampling_factor = 1.0 / pixel_samples;
+
+std::vector<std::shared_ptr<hittable>> hittables;
+
 int main()
 {
-    const int width = 600;
-    const int height = 600;
-
     sf::VideoMode video_mode(width, height);
     sf::RenderWindow window(video_mode, "RayTracer", sf::Style::Close);
 	sf::Event e;
-
-	// Define the camera and canvas
-	vec3 O = vec3(0.0, 0.0, 0.0);
-	double d = 1.0; // z-axis distance from camera to canvas
-	pixelmap pm(width, height);
-
-	int pixel_samples = 10;
-	double pixel_sampling_factor = 1.0 / pixel_samples;
 
 	// Add new materials
 	std::shared_ptr<diffuse> red_diffuse = std::make_shared<diffuse>(
@@ -66,7 +68,6 @@ int main()
 		colour(0.85, 0.85, 0.0));
 
 	// Add objects to the scene
-	std::vector<std::shared_ptr<hittable>> hittables;
 	hittables.push_back(std::make_shared<hittable_sphere>(
 		vec3(0.0, -1.0, 3.0), 1.0, red_diffuse));
 	hittables.push_back(std::make_shared<hittable_sphere>(
@@ -83,24 +84,20 @@ int main()
 		vec3(0.0, 10.0, 10.0), 2.0, colour(5.0, 5.0, 5.0)));
 
 	// Render the scene
-	for (int j = 0; j < height; ++j) {
-		for (int i = 0; i < width; ++i) {
-			colour pixel_colour;
-			for (int k = 0; k < pixel_samples; ++k) {
-				double v_x = ((i + random_num()) - width / 2.0) / (width) * 1.0;
-				double v_y = ((j + random_num()) - height / 2.0) / (height) * 1.0;
+	int threadCount = 6;
+	std::thread worker_0(render, threadCount, 0);
+	std::thread worker_1(render, threadCount, 1);
+	std::thread worker_2(render, threadCount, 2);
+	std::thread worker_3(render, threadCount, 3);
+	std::thread worker_4(render, threadCount, 4);
+	std::thread worker_5(render, threadCount, 5);
 
-				ray r(O, vec3(v_x, v_y, d));
-				pixel_colour += traceRay(r, hittables, small_amount, infinity, 1);
-			}
-
-			pixel_colour *= pixel_sampling_factor;
-			pixel_colour.clampColour();
-
-			pm.modifypixel(i, j, pixel_colour);
-		}
-		std::cout << "Rows left: " << (height - j) << std::endl;
-	}
+	worker_0.join();
+	worker_1.join();
+	worker_2.join();
+	worker_3.join();
+	worker_4.join();
+	worker_5.join();
 
 	// Create the sprite that will be displayed on window
 	sf::Image render_image;
@@ -213,4 +210,27 @@ colour traceRay(
 	}
 
 	return hit_colour * traceRay(scattered, hittable_list, t_min, t_max, depth + 1);
+}
+
+void render(int totalThreadCount, int threadNum)
+{
+	// Render the scene
+	for (int j = threadNum; j < height; j += totalThreadCount) {
+		for (int i = 0; i < width; ++i) {
+			colour pixel_colour;
+			for (int k = 0; k < pixel_samples; ++k) {
+				double v_x = ((i + random_num()) - width / 2.0) / (width) * 1.0;
+				double v_y = ((j + random_num()) - height / 2.0) / (height) * 1.0;
+
+				ray r(O, vec3(v_x, v_y, d));
+				pixel_colour += traceRay(r, hittables, small_amount, infinity, 1);
+			}
+
+			pixel_colour *= pixel_sampling_factor;
+			pixel_colour.clampColour();
+
+			pm.modifypixel(i, j, pixel_colour);
+		}
+		std::cout << "Rows left: " << (height - j) << std::endl;
+	}
 }
