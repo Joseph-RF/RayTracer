@@ -10,10 +10,12 @@
 #include "pixelmap.h"
 #include "ray.h"
 #include "material.h"
+#include "hittable.h"
 
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <thread>
 
 bool raySphereIntersection(
 	ray& r,
@@ -24,11 +26,13 @@ bool raySphereIntersection(
 );
 colour traceRay(
 	ray& r,
-	std::vector<std::shared_ptr<sphere>>& sphere_list,
+	std::vector<std::shared_ptr<hittable>>& hittable_list,
 	double t_min,
 	double t_max,
 	int depth
 );
+
+void renderScene();
 
 double infinity = std::numeric_limits<double>::infinity();
 double small_amount = 0.000001;
@@ -62,17 +66,21 @@ int main()
 		colour(0.85, 0.85, 0.0));
 
 	// Add objects to the scene
-	std::vector<std::shared_ptr<sphere>> spheres;
-	spheres.push_back(std::make_shared<sphere>(
+	std::vector<std::shared_ptr<hittable>> hittables;
+	hittables.push_back(std::make_shared<hittable_sphere>(
 		vec3(0.0, -1.0, 3.0), 1.0, red_diffuse));
-	spheres.push_back(std::make_shared<sphere>(
+	hittables.push_back(std::make_shared<hittable_sphere>(
 		vec3(-2.0, 0.0, 4.0), 1.0, blue_diffuse));
-	spheres.push_back(std::make_shared<sphere>(
+	hittables.push_back(std::make_shared<hittable_sphere>(
 		vec3(2.0, 0.0, 4.0), 1.0, shiny_metal));
-	spheres.push_back(std::make_shared<sphere>(
+	hittables.push_back(std::make_shared<hittable_sphere>(
 		vec3(4.0, 0.0, 8.0), 2.0, red_diffuse));
-	spheres.push_back(std::make_shared<sphere>(
+	hittables.push_back(std::make_shared<hittable_sphere>(
 		vec3(0.0, -5001.0, 0.0), 5000.0, yellow_diffuse));
+
+	// Lights
+	hittables.push_back(std::make_shared<hittable_light>(
+		vec3(0.0, 10.0, 10.0), 2.0, colour(5.0, 5.0, 5.0)));
 
 	// Render the scene
 	for (int j = 0; j < height; ++j) {
@@ -83,7 +91,7 @@ int main()
 				double v_y = ((j + random_num()) - height / 2.0) / (height) * 1.0;
 
 				ray r(O, vec3(v_x, v_y, d));
-				pixel_colour += traceRay(r, spheres, small_amount, infinity, 1);
+				pixel_colour += traceRay(r, hittables, small_amount, infinity, 1);
 			}
 
 			pixel_colour *= pixel_sampling_factor;
@@ -168,7 +176,7 @@ bool raySphereIntersection(
 
 colour traceRay(
 	ray& r,
-	std::vector<std::shared_ptr<sphere>>& sphere_list,
+	std::vector<std::shared_ptr<hittable>>& hittable_list,
 	double t_min,
 	double t_max,
 	int depth
@@ -180,26 +188,29 @@ colour traceRay(
 
 	double closest_t = infinity;
 	double t = 0.0;
-	std::shared_ptr<sphere> closest_sphere = nullptr;
+	std::shared_ptr<hittable> closest_hittable = nullptr;
 
-	for (std::shared_ptr<sphere> sphere : sphere_list) {
-		if (raySphereIntersection(r, sphere, t_min, t_max, t)) {
+	for (std::shared_ptr<hittable> hittable : hittable_list) {
+		if (hittable->hit(r, t_min, t_max, t)) {
 			if (t < closest_t) {
 				closest_t = t;
-				closest_sphere = sphere;
+				closest_hittable = hittable;
 			}
 		}
 	}
-	
-	if (closest_sphere == nullptr) {
+
+	if (closest_hittable == nullptr) {
 		// Colour of the background / sky
 		return colour(0.7, 0.9, 1.0);
+		//return colour(0.1, 0.1, 0.1);
 	}
 	
 	ray scattered(vec3(0.0, 0.0, 0.0), vec3(0.0, 0.0, 0.0));
 	colour hit_colour;
 
-	closest_sphere->hit(r, closest_t, scattered, hit_colour);
+	if (!closest_hittable->scatter(r, closest_t, scattered, hit_colour)) {
+		return hit_colour;
+	}
 
-	return hit_colour * traceRay(scattered, sphere_list, t_min, t_max, depth + 1);
+	return hit_colour * traceRay(scattered, hittable_list, t_min, t_max, depth + 1);
 }

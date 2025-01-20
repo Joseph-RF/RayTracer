@@ -57,6 +57,17 @@ vec3& vec3::operator*=(const double a)
 	return *this;
 }
 
+vec3& vec3::operator*=(const vec3& v)
+{
+	if (this == &v) {
+		return *this;
+	}
+	x *= v.x;
+	y *= v.y;
+	z *= v.z;
+	return *this;
+}
+
 vec3 vec3::operator-() const
 {
 	return vec3(-this->x, -this->y, -this->z);

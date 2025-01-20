@@ -11,15 +11,10 @@ class sphere
 {
 public:
 	sphere();
-	sphere(
-		vec3 position,
-		double radius,
-		std::shared_ptr<material> mat
-	);
+	sphere(const vec3& position, const double radius);
 
-	void hit(ray& r_in, double t, ray& r_out, colour& attenuation);
+	bool hit(ray& r, double t_min, double t_max, double& t);
 
 	vec3 position;
 	double radius;
-	std::shared_ptr<material> mat;
 };

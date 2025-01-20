@@ -22,6 +22,7 @@ public:
 	vec3& operator=(const vec3& v);
 	vec3& operator+=(const vec3& v);
 	vec3& operator*=(const double a);
+	vec3& operator*=(const vec3& v);
 
 	vec3 operator-() const;
 
@@ -54,5 +55,8 @@ static std::random_device rd;
 
 double random_num();
 double random_num(double a, double b);
+
+const double big = std::numeric_limits<double>::infinity();
+const double small = 0.001;
 
 using colour = vec3;
