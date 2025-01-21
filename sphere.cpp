@@ -36,4 +36,18 @@ bool sphere::hit(ray& r, double t_min, double t_max, double& t)
 		closest_t = t2;
 	}
 	t = closest_t;
+
+	return true;
+}
+
+void sphere::scatter(ray& r_in, double t, vec3& p, vec3& n)
+{
+	vec3 pos = r_in.origin + t * r_in.direction;
+	vec3 normal = (pos - position) / radius;
+
+	if (dot(r_in.direction, normal) > 0) {
+		normal = -normal;
+	}
+	p = pos;
+	n = normal;
 }

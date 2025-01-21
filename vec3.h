@@ -26,8 +26,10 @@ public:
 
 	vec3 operator-() const;
 
-	double length();
+	double length(); 
 	double length_sq();
+	vec3 normalise();
+
 	void clampColour();
 
 private:
@@ -45,6 +47,7 @@ vec3 operator/(const vec3& v, const double a);
 vec3 operator/(const vec3& u, const vec3& v);
 
 double dot(const vec3& u, const vec3& v);
+vec3 cross(const vec3& u, const vec3& v);
 
 vec3 random_unit_vector();
 

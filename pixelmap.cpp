@@ -13,8 +13,8 @@ void pixelmap::modifypixel(int x, int y, const colour& colour)
         std::cout << "out of range" << std::endl;
     }
 
-    pixels[index] = 255 * colour.get_x(); // Red
-    pixels[index + 1] = 255 * colour.get_y(); // Green
-    pixels[index + 2] = 255 * colour.get_z(); // Blue
-    pixels[index + 3] = 255; // Alpha
+    pixels[index] = 255.0 * colour.get_x(); // Red
+    pixels[index + 1] = 255.0 * colour.get_y(); // Green
+    pixels[index + 2] = 255.0 * colour.get_z(); // Blue
+    pixels[index + 3] = 255.0; // Alpha
 }

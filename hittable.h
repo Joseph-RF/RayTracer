@@ -8,45 +8,21 @@
 class hittable
 {
 public:
-	virtual bool hit(ray& r, double t_min, double t_max, double& t) = 0;
-	virtual bool scatter(
-		ray& r_in,
-		double t,
-		ray& r_out,
-		colour& attenuation
-	) = 0;
-};
-
-class hittable_sphere : public hittable
-{
-public:
-	hittable_sphere(
+	hittable(
 		const vec3& position,
 		const double radius,
 		std::shared_ptr<material> mat
 	);
 
 	bool hit(ray& r, double t_min, double t_max, double& t);
-	bool scatter(ray& r_in, double t, ray& r_out, colour& attenuation);
+	bool scatter(
+		ray& r_in,
+		double t,
+		ray& r_out,
+		colour& attenuation
+	);
 
 private:
 	sphere body;
 	std::shared_ptr<material> mat;
-};
-
-class hittable_light : public hittable
-{
-public:
-	hittable_light(
-		const vec3& position,
-		const double radius,
-		const colour& emission
-	);
-
-	bool hit(ray& r, double t_min, double t_max, double& t);
-	bool scatter(ray& r_in, double t, ray& r_out, colour& attenuation);
-
-private:
-	sphere body;
-	colour emission;
 };

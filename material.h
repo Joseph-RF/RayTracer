@@ -7,7 +7,7 @@
 class material
 {
 public:
-	virtual void scatter(
+	virtual bool scatter(
 		ray& r_in,
 		vec3& p,
 		vec3& n,
@@ -22,7 +22,7 @@ class diffuse : public material
 public:
 	diffuse(colour albedo);
 
-	void scatter(
+	bool scatter(
 		ray& r_in,
 		vec3& p,
 		vec3& n,
@@ -35,7 +35,36 @@ class metal : public material
 public:
 	metal(colour albedo);
 
-	void scatter(
+	bool scatter(
+		ray& r_in,
+		vec3& p,
+		vec3& n,
+		ray& r_out
+	);
+};
+
+class dielectric : public material
+{
+public:
+	dielectric(colour albedo, double rindex);
+
+	bool scatter(
+		ray& r_in,
+		vec3& p,
+		vec3& n,
+		ray& r_out
+	);
+
+private:
+	double rindex;
+};
+
+class light : public material
+{
+public:
+	light(colour emission);
+
+	bool scatter(
 		ray& r_in,
 		vec3& p,
 		vec3& n,

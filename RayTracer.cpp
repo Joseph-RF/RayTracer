@@ -11,11 +11,14 @@
 #include "ray.h"
 #include "material.h"
 #include "hittable.h"
+#include "camera.h"
 
 #include <iostream>
 #include <vector>
 #include <memory>
 #include <thread>
+
+void render(int totalThreadCount, int threadNum);
 
 bool raySphereIntersection(
 	ray& r,
@@ -32,22 +35,17 @@ colour traceRay(
 	int depth
 );
 
-void render(int totalThreadCount, int threadNum);
-
 double infinity = std::numeric_limits<double>::infinity();
 double small_amount = 0.000001;
 double max_depth = 10;
 
-const int width = 600;
-const int height = 600;
+const int width = 800;
+const int height = 800;
 
-// Define the camera and canvas
-vec3 O = vec3(0.0, 0.0, 0.0);
-double d = 1.0; // z-axis distance from camera to canvas
+
+// Define the camera
+camera cam;
 pixelmap pm(width, height);
-
-int pixel_samples = 10;
-double pixel_sampling_factor = 1.0 / pixel_samples;
 
 std::vector<std::shared_ptr<hittable>> hittables;
 
@@ -58,7 +56,7 @@ int main()
 	sf::Event e;
 
 	// Add new materials
-	std::shared_ptr<diffuse> red_diffuse = std::make_shared<diffuse>(
+	std::shared_ptr<metal> red_diffuse = std::make_shared<metal>(
 		colour(0.8, 0.1, 0.0));
 	std::shared_ptr<diffuse> blue_diffuse = std::make_shared<diffuse>(
 		colour(0.1, 0.0, 0.85));
@@ -66,24 +64,27 @@ int main()
 		colour(0.9, 0.9, 0.9));
 	std::shared_ptr<diffuse> yellow_diffuse = std::make_shared<diffuse>(
 		colour(0.85, 0.85, 0.0));
+	std::shared_ptr<light> white_light = std::make_shared<light>(
+		colour(20.0, 20.0, 20.0));
 
 	// Add objects to the scene
-	hittables.push_back(std::make_shared<hittable_sphere>(
+	hittables.push_back(std::make_shared<hittable>(
 		vec3(0.0, -1.0, 3.0), 1.0, red_diffuse));
-	hittables.push_back(std::make_shared<hittable_sphere>(
+	hittables.push_back(std::make_shared<hittable>(
 		vec3(-2.0, 0.0, 4.0), 1.0, blue_diffuse));
-	hittables.push_back(std::make_shared<hittable_sphere>(
+	hittables.push_back(std::make_shared<hittable>(
 		vec3(2.0, 0.0, 4.0), 1.0, shiny_metal));
-	hittables.push_back(std::make_shared<hittable_sphere>(
+	hittables.push_back(std::make_shared<hittable>(
 		vec3(4.0, 0.0, 8.0), 2.0, red_diffuse));
-	hittables.push_back(std::make_shared<hittable_sphere>(
+	hittables.push_back(std::make_shared<hittable>(
 		vec3(0.0, -5001.0, 0.0), 5000.0, yellow_diffuse));
 
 	// Lights
-	hittables.push_back(std::make_shared<hittable_light>(
-		vec3(0.0, 10.0, 10.0), 2.0, colour(5.0, 5.0, 5.0)));
+	hittables.push_back(std::make_shared<hittable>(
+		vec3(0.0, 10.0, 10.0), 2.0, white_light));
 
 	// Render the scene
+
 	int threadCount = 6;
 	std::thread worker_0(render, threadCount, 0);
 	std::thread worker_1(render, threadCount, 1);
@@ -102,6 +103,7 @@ int main()
 	// Create the sprite that will be displayed on window
 	sf::Image render_image;
 	render_image.create(width, height, pm.pixels.data());
+	render_image.saveToFile("render.png");
 
 	sf::Texture texture;
 	texture.loadFromImage(render_image);
@@ -131,6 +133,29 @@ int main()
 
         window.display();
     }
+}
+
+void render(int totalThreadCount, int threadNum)
+{
+	// Render the scene
+	for (int j = threadNum; j < height; j += totalThreadCount) {
+		for (int i = 0; i < width; ++i) {
+			colour pixel_colour;
+			for (int k = 0; k < cam.pixel_samples; ++k) {
+				double v_x = ((i + random_num()) - width / 2.0) / (width) * 1.0;
+				double v_y = ((j + random_num()) - height / 2.0) / (height) * 1.0;
+
+				ray r(cam.position, v_x * cam.u + v_y * cam.v + cam.d * cam.w);
+				pixel_colour += traceRay(r, hittables, small_amount, infinity, 1);
+			}
+
+			pixel_colour *= cam.pixel_sampling_factor;
+			pixel_colour.clampColour();
+
+			pm.modifypixel(i, j, pixel_colour);
+		}
+		std::cout << "Rows left: " << (height - j) << std::endl;
+	}
 }
 
 bool raySphereIntersection(
@@ -198,7 +223,7 @@ colour traceRay(
 
 	if (closest_hittable == nullptr) {
 		// Colour of the background / sky
-		return colour(0.7, 0.9, 1.0);
+		return colour(0.7, 0.9, 1.0) * 0.5;
 		//return colour(0.1, 0.1, 0.1);
 	}
 	
@@ -210,27 +235,4 @@ colour traceRay(
 	}
 
 	return hit_colour * traceRay(scattered, hittable_list, t_min, t_max, depth + 1);
-}
-
-void render(int totalThreadCount, int threadNum)
-{
-	// Render the scene
-	for (int j = threadNum; j < height; j += totalThreadCount) {
-		for (int i = 0; i < width; ++i) {
-			colour pixel_colour;
-			for (int k = 0; k < pixel_samples; ++k) {
-				double v_x = ((i + random_num()) - width / 2.0) / (width) * 1.0;
-				double v_y = ((j + random_num()) - height / 2.0) / (height) * 1.0;
-
-				ray r(O, vec3(v_x, v_y, d));
-				pixel_colour += traceRay(r, hittables, small_amount, infinity, 1);
-			}
-
-			pixel_colour *= pixel_sampling_factor;
-			pixel_colour.clampColour();
-
-			pm.modifypixel(i, j, pixel_colour);
-		}
-		std::cout << "Rows left: " << (height - j) << std::endl;
-	}
 }

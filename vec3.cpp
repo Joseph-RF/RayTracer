@@ -83,6 +83,11 @@ double vec3::length_sq()
 	return (x * x + y * y + z * z);
 }
 
+vec3 vec3::normalise()
+{
+	return vec3(x, y, z) / this->length();
+}
+
 void vec3::clampColour()
 {
 	// Clamp the RGB values such that they aren't greater than 255
@@ -144,6 +149,13 @@ double dot(const vec3& u, const vec3& v)
 	return (u.get_x() * v.get_x() + 
 			u.get_y() * v.get_y() + 
 			u.get_z() * v.get_z());
+}
+
+vec3 cross(const vec3& u, const vec3& v)
+{
+	return vec3(u.get_y() * v.get_z() - u.get_z() * v.get_y(),
+				u.get_z() * v.get_x() - u.get_x() * v.get_z(),
+				u.get_x() * v.get_y() - u.get_y() * v.get_x());
 }
 
 vec3 random_unit_vector()
