@@ -73,7 +73,7 @@ vec3 vec3::operator-() const
 	return vec3(-this->x, -this->y, -this->z);
 }
 
-double vec3::length()
+double vec3::length() const
 {
 	return std::sqrt(x * x + y * y + z * z);
 }
@@ -86,6 +86,18 @@ double vec3::length_sq()
 vec3 vec3::normalise()
 {
 	return vec3(x, y, z) / this->length();
+}
+
+vec3 vec3::y_rotation(const double angle_degrees)
+{
+	double angle_radians = angle_degrees * pi / 180.0;
+	double sin_theta = std::sin(angle_radians);
+	double cos_theta = std::cos(angle_radians);
+
+	return vec3(
+		cos_theta * x + sin_theta * z,
+		y,
+		-sin_theta * x + cos_theta * z);
 }
 
 void vec3::clampColour()
@@ -191,4 +203,20 @@ double random_num(double a, double b)
 	static std::mt19937 generator;
 
 	return dist(generator);
+}
+
+double absolute(const double& a)
+{
+	if (a < 0.0) {
+		return -a;
+	}
+	return a;
+}
+
+double gammaCorrection(double linear)
+{
+	if (linear > 0.0) {
+		return std::sqrt(linear);
+	}
+	return 0.0;
 }

@@ -2,7 +2,7 @@
 
 #include "vec3.h"
 #include "ray.h"
-#include "sphere.h"
+#include "shape.h"
 
 class material
 {

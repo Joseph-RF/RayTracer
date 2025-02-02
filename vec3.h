@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include <limits>
 #include <random>
 
@@ -26,9 +28,11 @@ public:
 
 	vec3 operator-() const;
 
-	double length(); 
+	double length() const; 
 	double length_sq();
 	vec3 normalise();
+
+	vec3 y_rotation(const double angle_degrees);
 
 	void clampColour();
 
@@ -53,11 +57,17 @@ vec3 random_unit_vector();
 
 vec3 reflect(const vec3& a, const vec3 b);
 
+const double pi = 3.141592;
+
 // Not strictly vec3
 static std::random_device rd;
 
 double random_num();
 double random_num(double a, double b);
+
+double absolute(const double& a);
+
+double gammaCorrection(double linear);
 
 const double big = std::numeric_limits<double>::infinity();
 const double small = 0.001;

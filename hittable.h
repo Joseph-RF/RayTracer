@@ -2,15 +2,14 @@
 
 #include "vec3.h"
 #include "ray.h"
-#include "sphere.h"
+#include "shape.h"
 #include "material.h"
 
 class hittable
 {
 public:
 	hittable(
-		const vec3& position,
-		const double radius,
+		std::shared_ptr<shape> body,
 		std::shared_ptr<material> mat
 	);
 
@@ -23,6 +22,6 @@ public:
 	);
 
 private:
-	sphere body;
+	std::shared_ptr<shape> body;
 	std::shared_ptr<material> mat;
 };

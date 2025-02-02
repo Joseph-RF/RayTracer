@@ -21,7 +21,7 @@
     <ClCompile Include="vec3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sphere.cpp">
+    <ClCompile Include="shape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pixelmap.cpp">
@@ -44,7 +44,7 @@
     <ClInclude Include="vec3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sphere.h">
+    <ClInclude Include="shape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pixelmap.h">

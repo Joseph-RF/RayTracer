@@ -1,32 +1,29 @@
 // RayTracer.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <thread>
+
 #include "SFML/System.hpp"
 #include "SFML/Graphics.hpp"
 #include "SFML/Window.hpp"
 
 #include "vec3.h"
-#include "sphere.h"
+#include "shape.h"
 #include "pixelmap.h"
 #include "ray.h"
 #include "material.h"
 #include "hittable.h"
 #include "camera.h"
 
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <thread>
+void spheresScene();
+void cornellBox();
+void singleBox();
 
 void render(int totalThreadCount, int threadNum);
 
-bool raySphereIntersection(
-	ray& r,
-	std::shared_ptr<sphere>& s,
-	double t_min,
-	double t_max,
-	double& t
-);
 colour traceRay(
 	ray& r,
 	std::vector<std::shared_ptr<hittable>>& hittable_list,
@@ -55,36 +52,13 @@ int main()
     sf::RenderWindow window(video_mode, "RayTracer", sf::Style::Close);
 	sf::Event e;
 
-	// Add new materials
-	std::shared_ptr<metal> red_diffuse = std::make_shared<metal>(
-		colour(0.8, 0.1, 0.0));
-	std::shared_ptr<diffuse> blue_diffuse = std::make_shared<diffuse>(
-		colour(0.1, 0.0, 0.85));
-	std::shared_ptr<metal> shiny_metal = std::make_shared<metal>(
-		colour(0.9, 0.9, 0.9));
-	std::shared_ptr<diffuse> yellow_diffuse = std::make_shared<diffuse>(
-		colour(0.85, 0.85, 0.0));
-	std::shared_ptr<light> white_light = std::make_shared<light>(
-		colour(20.0, 20.0, 20.0));
-
-	// Add objects to the scene
-	hittables.push_back(std::make_shared<hittable>(
-		vec3(0.0, -1.0, 3.0), 1.0, red_diffuse));
-	hittables.push_back(std::make_shared<hittable>(
-		vec3(-2.0, 0.0, 4.0), 1.0, blue_diffuse));
-	hittables.push_back(std::make_shared<hittable>(
-		vec3(2.0, 0.0, 4.0), 1.0, shiny_metal));
-	hittables.push_back(std::make_shared<hittable>(
-		vec3(4.0, 0.0, 8.0), 2.0, red_diffuse));
-	hittables.push_back(std::make_shared<hittable>(
-		vec3(0.0, -5001.0, 0.0), 5000.0, yellow_diffuse));
-
-	// Lights
-	hittables.push_back(std::make_shared<hittable>(
-		vec3(0.0, 10.0, 10.0), 2.0, white_light));
+	//spheresScene();
+	cornellBox();
+	//singleBox();
 
 	// Render the scene
 
+	/*
 	int threadCount = 6;
 	std::thread worker_0(render, threadCount, 0);
 	std::thread worker_1(render, threadCount, 1);
@@ -99,6 +73,9 @@ int main()
 	worker_3.join();
 	worker_4.join();
 	worker_5.join();
+	*/
+
+	render(1, 0);
 
 	// Create the sprite that will be displayed on window
 	sf::Image render_image;
@@ -135,6 +112,142 @@ int main()
     }
 }
 
+void spheresScene()
+{
+	// Add materials
+	std::shared_ptr<metal> red_diffuse = std::make_shared<metal>(
+		colour(0.8, 0.1, 0.0));
+	std::shared_ptr<diffuse> blue_diffuse = std::make_shared<diffuse>(
+		colour(0.1, 0.0, 0.85));
+	std::shared_ptr<metal> shiny_metal = std::make_shared<metal>(
+		colour(0.9, 0.9, 0.9));
+	std::shared_ptr<diffuse> yellow_diffuse = std::make_shared<diffuse>(
+		colour(0.85, 0.85, 0.0));
+	std::shared_ptr<light> white_light = std::make_shared<light>(
+		colour(20.0, 20.0, 20.0));
+
+	// Add shapes
+	std::shared_ptr<sphere> red_sphere0_body = std::make_shared<sphere>(
+		vec3(0.0, -1.0, 3.0), 1.0);
+	std::shared_ptr<sphere> blue_sphere0_body = std::make_shared<sphere>(
+		vec3(-2.0, 0.0, 4.0), 1.0);
+	std::shared_ptr<sphere> metal_sphere0_body = std::make_shared<sphere>(
+		vec3(2.0, 0.0, 4.0), 1.0);
+	std::shared_ptr<sphere> red_sphere1_body = std::make_shared<sphere>(
+		vec3(4.0, 0.0, 8.0), 2.0);
+	std::shared_ptr<sphere> yellow_sphere0_body = std::make_shared<sphere>(
+		vec3(0.0, -5001.0, 0.0), 5000.0);
+	std::shared_ptr<sphere> light_sphere0_body = std::make_shared<sphere>(
+		vec3(-4.0, 10.0, -0.0), 1.0);
+	//std::shared_ptr<quad> red_quad0_body = std::make_shared<quad>(
+	//	vec3(-2.0, 1.0, 6.0), vec3(0.0, 1.0, -1.0), vec3(1.0, 0.0, 0.0));
+	//std::shared_ptr<triangle> red_tri0_body = std::make_shared<triangle>(
+	//	vec3(-2.0, 1.0, 6.0), vec3(0.0, 1.0, -1.0), vec3(1.0, 0.0, 0.0));
+	std::shared_ptr<cube> red_cub0_body = std::make_shared<cube>(
+		vec3(-2.0, -1.0, 0.0), 1.0);
+
+	// Add objects to the scene
+	hittables.push_back(std::make_shared<hittable>(
+		red_sphere0_body, red_diffuse));
+	hittables.push_back(std::make_shared<hittable>(
+		blue_sphere0_body, blue_diffuse));
+	hittables.push_back(std::make_shared<hittable>(
+		metal_sphere0_body, shiny_metal));
+	hittables.push_back(std::make_shared<hittable>(
+		red_sphere1_body, red_diffuse));
+	hittables.push_back(std::make_shared<hittable>(
+		yellow_sphere0_body, yellow_diffuse));
+	hittables.push_back(std::make_shared<hittable>(
+		red_cub0_body, blue_diffuse));
+
+	// Lights
+	hittables.push_back(std::make_shared<hittable>(
+		light_sphere0_body, white_light));
+}
+
+void cornellBox()
+{
+	std::shared_ptr<diffuse> red = std::make_shared<diffuse>(colour(0.65, 0.05, 0.05));
+	std::shared_ptr<diffuse> white = std::make_shared<diffuse>(colour(0.73, 0.73, 0.73));
+	std::shared_ptr<diffuse> green = std::make_shared<diffuse>(colour(0.12, 0.45, 0.15));
+	std::shared_ptr<light> white_light = std::make_shared<light>(colour(15, 15, 15));
+	std::shared_ptr<metal> shiny_metal = std::make_shared<metal>(colour(0.8, 0.8, 0.8));
+
+	std::shared_ptr<quad> wall0 = std::make_shared<quad>(vec3(2, 0, 0), vec3(0, 2, 0), vec3(0, 0, 2));
+	std::shared_ptr<quad> wall1 = std::make_shared<quad>(vec3(0, 0, 0), vec3(0, 2, 0), vec3(0, 0, 2));
+	// world.add(make_shared<quad>(point3(0, 0, 0), vec3(0, 555, 0), vec3(0, 0, 555), red));
+	std::shared_ptr<quad> wall2 = std::make_shared<quad>(vec3(2, 2, 2), vec3(-2, 0, 0), vec3(0, 0, -2));
+	// world.add(make_shared<quad>(point3(555, 555, 555), vec3(-555, 0, 0), vec3(0, 0, -555), white));
+	std::shared_ptr<quad> wall3 = std::make_shared<quad>(vec3(0, 0, 0), vec3(2, 0, 0), vec3(0, 0, 2));
+	std::shared_ptr<quad> wall4 = std::make_shared<quad>(vec3(0, 0, 2), vec3(2, 0, 0), vec3(0, 2, 0));
+	std::shared_ptr<quad> light_body = std::make_shared<quad>(vec3(1.24, 1.99, 1.22), vec3(-0.47, 0, 0), vec3(0, 0, -0.38));
+
+	vec3 u(1.0, 0.0, 0.0);
+	vec3 v(0.0, 1.0, 0.0);
+	vec3 w(0.0, 0.0, 1.0);
+	double angle = 60.0;
+
+	std::shared_ptr<cube> block0 = std::make_shared<cube>(
+		vec3(0.2, 0.0, 1.0),
+		u.y_rotation(angle),
+		v.y_rotation(angle),
+		w.y_rotation(angle),
+		0.5);
+
+	angle = -45.0;
+
+	std::shared_ptr<cube> block1 = std::make_shared<cube>(
+		vec3(1.5, 0.0, 0.5),
+		u.y_rotation(angle),
+		v.y_rotation(angle),
+		w.y_rotation(angle),
+		0.5);
+
+	hittables.push_back(std::make_shared<hittable>(
+		wall0, red));
+	hittables.push_back(std::make_shared<hittable>(
+		wall1, green));
+	hittables.push_back(std::make_shared<hittable>(
+		wall2, white));
+	hittables.push_back(std::make_shared<hittable>(
+		wall3, white));
+	hittables.push_back(std::make_shared<hittable>(
+		wall4, white));
+	hittables.push_back(std::make_shared<hittable>(
+		light_body, white_light));
+	hittables.push_back(std::make_shared<hittable>(
+		block0, white));
+	hittables.push_back(std::make_shared<hittable>(
+		block1, shiny_metal));
+}
+
+void singleBox()
+{
+	std::shared_ptr<diffuse> yellow_diffuse = std::make_shared<diffuse>(
+		colour(0.85, 0.85, 0.0));
+	std::shared_ptr<diffuse> white = std::make_shared<diffuse>(colour(0.73, 0.73, 0.73));
+
+	std::shared_ptr<sphere> yellow_sphere0_body = std::make_shared<sphere>(
+	vec3(0.0, -5001.0, 0.0), 5000.0);
+
+	vec3 u(1.0, 0.0, 0.0);
+	vec3 v(0.0, 1.0, 0.0);
+	vec3 w(0.0, 0.0, 1.0);
+	double angle = 60.0;
+
+	std::shared_ptr<cube> block0 = std::make_shared<cube>(
+		vec3(1.0, 0.0, 1.0),
+		u.y_rotation(angle),
+		v.y_rotation(angle),
+		w.y_rotation(angle),
+		0.7);
+
+	hittables.push_back(std::make_shared<hittable>(
+		yellow_sphere0_body, yellow_diffuse));
+	hittables.push_back(std::make_shared<hittable>(
+		block0, white));
+}
+
 void render(int totalThreadCount, int threadNum)
 {
 	// Render the scene
@@ -150,50 +263,11 @@ void render(int totalThreadCount, int threadNum)
 			}
 
 			pixel_colour *= cam.pixel_sampling_factor;
-			pixel_colour.clampColour();
 
 			pm.modifypixel(i, j, pixel_colour);
 		}
 		std::cout << "Rows left: " << (height - j) << std::endl;
 	}
-}
-
-bool raySphereIntersection(
-	ray& r,
-	std::shared_ptr<sphere>& s,
-	double t_min,
-	double t_max,
-	double& t
-)
-{
-	// Returns false if no intersection
-
-	double closest_t = infinity;
-
-	vec3 OC = r.origin - s->position;
-	double a = dot(r.direction, r.direction);
-	double b = 2 * dot(OC, r.direction);
-	double c = dot(OC, OC) - (s->radius * s->radius);
-
-	double discriminant = b * b - 4 * a * c;
-
-	if (discriminant < 0.0) {
-		return false;
-	}
-
-	double discriminant_sqrt = std::sqrt(discriminant);
-
-	double t1 = (-b + discriminant_sqrt )/ (2 * a);
-	double t2 = (-b - discriminant_sqrt) / (2 * a);
-
-	if (t1 > t_min && t1 < t_max && t1 < closest_t) {
-		closest_t = t1;
-	}
-	if (t2 > t_min && t2 < t_max && t2 < closest_t) {
-		closest_t = t2;
-	}
-	t = closest_t;
-	return true;
 }
 
 colour traceRay(
@@ -223,7 +297,8 @@ colour traceRay(
 
 	if (closest_hittable == nullptr) {
 		// Colour of the background / sky
-		return colour(0.7, 0.9, 1.0) * 0.5;
+		return colour(0.0, 0.0, 0.0);
+		//return colour(0.7, 0.9, 1.0) * 0.8;
 		//return colour(0.1, 0.1, 0.1);
 	}
 	

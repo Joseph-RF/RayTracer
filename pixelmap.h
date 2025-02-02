@@ -1,11 +1,11 @@
 #pragma once
 
+#include <iostream>
+#include <vector>
+
 #include "SFML/System.hpp"
 
 #include "vec3.h"
-
-#include <iostream>
-#include <vector>
 
 class pixelmap
 {
@@ -14,7 +14,7 @@ public:
 
     std::vector<sf::Uint8> pixels;
 
-    void modifypixel(int x, int y, const colour& colour);
+    void modifypixel(int x, int y, const colour& pixel_colour);
 
 private:
     int nx;
