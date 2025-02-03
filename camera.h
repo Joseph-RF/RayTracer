@@ -2,20 +2,20 @@
 
 #include "vec3.h"
 
-class camera
+class Camera
 {
 public:
-	camera();
+	Camera();
 
-	vec3 position;
-	vec3 lookat;
-	vec3 lookup;
+	Vec3 position;
+	Vec3 lookat;
+	Vec3 lookup;
 
 	double d;
 
-	vec3 w;
-	vec3 v;
-	vec3 u;
+	Vec3 w;
+	Vec3 v;
+	Vec3 u;
 
 	double pixel_samples;
 	double pixel_sampling_factor;

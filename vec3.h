@@ -5,12 +5,12 @@
 #include <limits>
 #include <random>
 
-class vec3
+class Vec3
 {
 public:
-	vec3();
-	vec3(double x, double y, double z);
-	vec3(const vec3& v);
+	Vec3();
+	Vec3(double x, double y, double z);
+	Vec3(const Vec3& v);
 
 	double get_x() const;
 	double get_y() const;
@@ -21,18 +21,18 @@ public:
 	void set_z(double z);
 
 	// Overloading operators
-	vec3& operator=(const vec3& v);
-	vec3& operator+=(const vec3& v);
-	vec3& operator*=(const double a);
-	vec3& operator*=(const vec3& v);
+	Vec3& operator=(const Vec3& v);
+	Vec3& operator+=(const Vec3& v);
+	Vec3& operator*=(const double a);
+	Vec3& operator*=(const Vec3& v);
 
-	vec3 operator-() const;
+	Vec3 operator-() const;
 
 	double length() const; 
 	double length_sq();
-	vec3 normalise();
+	Vec3 normalise();
 
-	vec3 y_rotation(const double angle_degrees);
+	Vec3 y_rotation(const double angle_degrees);
 
 	void clampColour();
 
@@ -41,25 +41,25 @@ private:
 };
 
 // Arithmetic operator overloading
-vec3 operator+(const vec3& u, const vec3& v);
-vec3 operator-(const vec3& u, const vec3& v);
-vec3 operator*(const double a, const vec3& v);
-vec3 operator*(const vec3& v, const double a);
-vec3 operator*(const vec3& u, const vec3& v);
-vec3 operator/(const double a, const vec3& v);
-vec3 operator/(const vec3& v, const double a);
-vec3 operator/(const vec3& u, const vec3& v);
+Vec3 operator+(const Vec3& u, const Vec3& v);
+Vec3 operator-(const Vec3& u, const Vec3& v);
+Vec3 operator*(const double a, const Vec3& v);
+Vec3 operator*(const Vec3& v, const double a);
+Vec3 operator*(const Vec3& u, const Vec3& v);
+Vec3 operator/(const double a, const Vec3& v);
+Vec3 operator/(const Vec3& v, const double a);
+Vec3 operator/(const Vec3& u, const Vec3& v);
 
-double dot(const vec3& u, const vec3& v);
-vec3 cross(const vec3& u, const vec3& v);
+double dot(const Vec3& u, const Vec3& v);
+Vec3 cross(const Vec3& u, const Vec3& v);
 
-vec3 random_unit_vector();
+Vec3 random_unit_vector();
 
-vec3 reflect(const vec3& a, const vec3 b);
+Vec3 reflect(const Vec3& a, const Vec3 b);
 
 const double pi = 3.141592;
 
-// Not strictly vec3
+// Not strictly Vec3
 static std::random_device rd;
 
 double random_num();
@@ -72,4 +72,4 @@ double gammaCorrection(double linear);
 const double big = std::numeric_limits<double>::infinity();
 const double small = 0.001;
 
-using colour = vec3;
+using Colour = Vec3;

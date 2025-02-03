@@ -5,89 +5,85 @@
 #include "vec3.h"
 #include "material.h"
 
-class material;
+class Material;
 
-class shape
+class Shape
 {
 public:
-	virtual bool hit(ray& r, double t_min, double t_max, double& t) = 0;
-	virtual void scatter(ray& r_in, double t, vec3& p, vec3& n) = 0;
+	virtual bool hit(Ray& r, double t_min, double t_max, double& t) = 0;
+	virtual void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) = 0;
 };
 
-class sphere : public shape
+class Sphere : public Shape
 {
 public:
-	sphere();
-	sphere(const vec3& position, const double radius);
+	Sphere();
+	Sphere(const Vec3& position, const double radius);
 
-	bool hit(ray& r, double t_min, double t_max, double& t) override;
-	void scatter(ray& r_in, double t, vec3& p, vec3& n) override;
+	bool hit(Ray& r, double t_min, double t_max, double& t) override;
+	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
 
-	vec3 position;
+	Vec3 position;
 	double radius;
 };
 
-class quad : public shape
+class Quad : public Shape
 {
 public:
-	quad();
-	quad(const vec3& Q, const vec3& u, const vec3& v);
+	Quad();
+	Quad(const Vec3& Q, const Vec3& u, const Vec3& v);
 
-	bool hit(ray& r, double t_min, double t_max, double& t) override;
-	void scatter(ray& r_in, double t, vec3& p, vec3& n) override;
+	bool hit(Ray& r, double t_min, double t_max, double& t) override;
+	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
 
 private:
-	vec3 Q;
-	vec3 u;
-	vec3 v;
+	Vec3 Q;
+	Vec3 u;
+	Vec3 v;
 
-	std::vector<vec3> vertices = std::vector<vec3>(4);
+	std::vector<Vec3> vertices = std::vector<Vec3>(4);
 
-	vec3 normal;
+	Vec3 normal;
 };
 
-class triangle : public shape
+class Triangle : public Shape
 {
 public:
-	triangle(const vec3& Q, const vec3& u, const vec3& v);
+	Triangle(const Vec3& Q, const Vec3& u, const Vec3& v);
 
-	bool hit(ray& r, double t_min, double t_max, double& t) override;
-	void scatter(ray& r_in, double t, vec3& p, vec3& n) override;
+	bool hit(Ray& r, double t_min, double t_max, double& t) override;
+	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
 
 private:
-	vec3 Q;
-	vec3 u;
-	vec3 v;
+	Vec3 Q;
+	Vec3 u;
+	Vec3 v;
 
-	std::vector<vec3> vertices = std::vector<vec3>(3);
+	std::vector<Vec3> vertices = std::vector<Vec3>(3);
 
-	vec3 normal;
+	Vec3 normal;
 };
 
-class cube : public shape
+class Cube : public Shape
 {
 public:
-	cube(const vec3& Q, const double length);
-	cube(
-		const vec3& Q,
-		const vec3& u,
-		const vec3& v,
-		const vec3& w,
-		const double length
-	);
+	Cube(const Vec3& Q, const double length);
+	Cube(const Vec3& Q, const Vec3& u,
+		 const Vec3& v, const Vec3& w,
+		 const double length);
 
-	bool hit(ray& r, double t_min, double t_max, double& t) override;
-	void scatter(ray& r_in, double t, vec3& p, vec3& n) override;
+	bool hit(Ray& r, double t_min, double t_max, double& t) override;
+	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
 
 private:
-	vec3 Q;
+	Vec3 Q;
 	double length;
 	
-	std::vector<quad> faces = std::vector<quad>(6);
+	std::vector<Quad> faces = std::vector<Quad>(6);
 	// Used to pass the information from hit function to scatter function
-	//which face was hit by the ray of light
+	//which face was hit by the Ray of light
 	int face_hit;
 };
 
-bool interior(const std::vector<vec3>& vertices, const vec3& p);
-bool same_side(const vec3& a, const vec3& b, const vec3& c, const vec3& p);
+bool interior(const std::vector<Vec3>& vertices, const Vec3& p);
+bool same_side(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& p);

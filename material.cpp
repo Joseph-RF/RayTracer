@@ -1,17 +1,10 @@
 #include "material.h"
 
-diffuse::diffuse(colour albedo)
-{
+Diffuse::Diffuse(Colour albedo) {
 	this->albedo = albedo;
 }
 
-bool diffuse::scatter(
-	ray& r_in,
-	vec3& p,
-	vec3& n,
-	ray& r_out
-)
-{
+bool Diffuse::scatter(Ray& r_in, Vec3& p, Vec3& n, Ray& r_out) {
 	n = n / n.length();
 	r_out.direction = n + random_unit_vector();
 	r_out.origin = p;
@@ -19,13 +12,11 @@ bool diffuse::scatter(
 	return true;
 }
 
-metal::metal(colour albedo)
-{
+Metal::Metal(Colour albedo) {
 	this->albedo = albedo;
 }
 
-bool metal::scatter(ray& r_in, vec3& p, vec3& n, ray& r_out)
-{
+bool Metal::scatter(Ray& r_in, Vec3& p, Vec3& n, Ray& r_out) {
 	n = n / n.length();
 	r_out.direction = reflect(r_in.direction, n);
 	r_out.origin = p;
@@ -33,22 +24,18 @@ bool metal::scatter(ray& r_in, vec3& p, vec3& n, ray& r_out)
 	return true;
 }
 
-dielectric::dielectric(colour albedo, double rindex) : rindex(rindex)
-{
+Dielectric::Dielectric(Colour albedo, double rindex) : rindex(rindex) {
 	this->albedo = albedo;
 }
 
-bool dielectric::scatter(ray& r_in, vec3& p, vec3& n, ray& r_out)
-{
+bool Dielectric::scatter(Ray& r_in, Vec3& p, Vec3& n, Ray& r_out) {
 	return true;
 }
 
-light::light(colour emission)
-{
+Light::Light(Colour emission) {
 	this->albedo = emission;
 }
 
-bool light::scatter(ray& r_in, vec3& p, vec3& n, ray& r_out)
-{
+bool Light::scatter(Ray& r_in, Vec3& p, Vec3& n, Ray& r_out) {
 	return false;
 }

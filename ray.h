@@ -2,11 +2,11 @@
 
 #include "vec3.h"
 
-class ray
+class Ray
 {
 public:
-	ray(vec3 origin, vec3 direction);
+	Ray(Vec3 origin, Vec3 direction);
 
-	vec3 origin;
-	vec3 direction;
+	Vec3 origin;
+	Vec3 direction;
 };

@@ -1,13 +1,13 @@
 #include "camera.h"
 
-camera::camera()
+Camera::Camera()
 {
-	//position = vec3(-2.0, 2.0, -4.0);
-	//lookat = vec3(-0.5, -0.25, 1.0);
-	position = vec3(1.0, 1.0, -2.0);
-	lookat = vec3(1.0, 1.0, 1.0);
+	//position = Vec3(-2.0, 2.0, -4.0);
+	//lookat = Vec3(-0.5, -0.25, 1.0);
+	position = Vec3(1.0, 1.0, -2.0);
+	lookat = Vec3(1.0, 1.0, 1.0);
 
-	lookup = vec3(0.0, 1.0, 0.0);
+	lookup = Vec3(0.0, 1.0, 0.0);
 
 	d = 1.0;
 

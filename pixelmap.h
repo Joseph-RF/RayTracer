@@ -7,14 +7,14 @@
 
 #include "vec3.h"
 
-class pixelmap
+class PixelMap
 {
 public:
-    pixelmap(int nx, int ny);
+    PixelMap(int nx, int ny);
 
     std::vector<sf::Uint8> pixels;
 
-    void modifypixel(int x, int y, const colour& pixel_colour);
+    void modifypixel(int x, int y, const Colour& pixel_colour);
 
 private:
     int nx;

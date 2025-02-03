@@ -5,23 +5,18 @@
 #include "shape.h"
 #include "material.h"
 
-class hittable
+class Hittable
 {
 public:
-	hittable(
-		std::shared_ptr<shape> body,
-		std::shared_ptr<material> mat
+	Hittable(
+		std::shared_ptr<Shape> body,
+		std::shared_ptr<Material> mat
 	);
 
-	bool hit(ray& r, double t_min, double t_max, double& t);
-	bool scatter(
-		ray& r_in,
-		double t,
-		ray& r_out,
-		colour& attenuation
-	);
+	bool hit(Ray& r, double t_min, double t_max, double& t);
+	bool scatter(Ray& r_in, double t, Ray& r_out, Colour& attenuation);
 
 private:
-	std::shared_ptr<shape> body;
-	std::shared_ptr<material> mat;
+	std::shared_ptr<Shape> body;
+	std::shared_ptr<Material> mat;
 };

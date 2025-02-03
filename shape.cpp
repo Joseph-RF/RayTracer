@@ -1,20 +1,17 @@
 #include "shape.h"
 #include <iostream>
 
-sphere::sphere() : radius(0.0)
-{
+Sphere::Sphere() : radius(0.0) {
 }
 
-sphere::sphere(const vec3& position, const double radius) 
-	: position(position), radius(radius)
-{
+Sphere::Sphere(const Vec3& position, const double radius) 
+	: position(position), radius(radius) {
 }
 
-bool sphere::hit(ray& r, double t_min, double t_max, double& t)
-{
+bool Sphere::hit(Ray& r, double t_min, double t_max, double& t) {
 	double closest_t = big;
 
-	vec3 OC = r.origin - position;
+	Vec3 OC = r.origin - position;
 	double a = dot(r.direction, r.direction);
 	double b = 2 * dot(OC, r.direction);
 	double c = dot(OC, OC) - (radius * radius);
@@ -41,10 +38,9 @@ bool sphere::hit(ray& r, double t_min, double t_max, double& t)
 	return true;
 }
 
-void sphere::scatter(ray& r_in, double t, vec3& p, vec3& n)
-{
-	vec3 pos = r_in.origin + t * r_in.direction;
-	vec3 normal = (pos - position) / radius;
+void Sphere::scatter(Ray& r_in, double t, Vec3& p, Vec3& n) {
+	Vec3 pos = r_in.origin + t * r_in.direction;
+	Vec3 normal = (pos - position) / radius;
 
 	if (dot(r_in.direction, normal) > 0) {
 		normal = -normal;
@@ -53,14 +49,12 @@ void sphere::scatter(ray& r_in, double t, vec3& p, vec3& n)
 	n = normal;
 }
 
-quad::quad()
-{
-	vertices = std::vector<vec3>(4);
+Quad::Quad() {
+	vertices = std::vector<Vec3>(4);
 }
 
-quad::quad(const vec3& Q, const vec3& u, const vec3& v)
-	: Q(Q), u(u), v(v)
-{
+Quad::Quad(const Vec3& Q, const Vec3& u, const Vec3& v)
+	: Q(Q), u(u), v(v) {
 	vertices[0] = Q;
 	vertices[1] = Q + u;
 	vertices[2] = Q + u + v;
@@ -69,8 +63,7 @@ quad::quad(const vec3& Q, const vec3& u, const vec3& v)
 	normal = cross(u, v);
 }
 
-bool quad::hit(ray& r, double t_min, double t_max, double& t)
-{
+bool Quad::hit(Ray& r, double t_min, double t_max, double& t) {
 	double denom = dot(normal, r.direction);
 
 	// Get rid of values that are too close to being parallel
@@ -87,8 +80,7 @@ bool quad::hit(ray& r, double t_min, double t_max, double& t)
 	return interior(vertices, r.origin + t * r.direction);
 }
 
-void quad::scatter(ray& r_in, double t, vec3& p, vec3& n)
-{
+void Quad::scatter(Ray& r_in, double t, Vec3& p, Vec3& n) {
 	p = r_in.origin + t * r_in.direction;
 	n = normal;
 
@@ -97,9 +89,8 @@ void quad::scatter(ray& r_in, double t, vec3& p, vec3& n)
 	}
 }
 
-triangle::triangle(const vec3& Q, const vec3& u, const vec3& v)
-	: Q(Q), u(u), v(v)
-{
+Triangle::Triangle(const Vec3& Q, const Vec3& u, const Vec3& v)
+	: Q(Q), u(u), v(v) {
 	vertices[0] = Q;
 	vertices[1] = Q + u;
 	vertices[2] = Q + v;
@@ -107,8 +98,7 @@ triangle::triangle(const vec3& Q, const vec3& u, const vec3& v)
 	normal = cross(u, v);
 }
 
-bool triangle::hit(ray& r, double t_min, double t_max, double& t)
-{
+bool Triangle::hit(Ray& r, double t_min, double t_max, double& t) {
 	double denom = dot(normal, r.direction);
 
 	// Get rid of values that are too close to being parallel
@@ -125,8 +115,7 @@ bool triangle::hit(ray& r, double t_min, double t_max, double& t)
 	return interior(vertices, r.origin + t * r.direction);
 }
 
-void triangle::scatter(ray& r_in, double t, vec3& p, vec3& n)
-{
+void Triangle::scatter(Ray& r_in, double t, Vec3& p, Vec3& n) {
 	p = r_in.origin + t * r_in.direction;
 	n = normal;
 
@@ -135,8 +124,7 @@ void triangle::scatter(ray& r_in, double t, vec3& p, vec3& n)
 	}
 }
 
-bool interior(const std::vector<vec3>& vertices, const vec3& p)
-{
+bool interior(const std::vector<Vec3>& vertices, const Vec3& p) {
 	// Tells returns whether a point on a plane is inside a 2D shape with
 	// vertices vertices.
 
@@ -154,60 +142,52 @@ bool interior(const std::vector<vec3>& vertices, const vec3& p)
 	return true;
 }
 
-bool same_side(const vec3& a, const vec3& b, const vec3& c, const vec3& p)
-{
+bool same_side(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& p) {
 	// Note, a, b and c need to be in that order of the shape
-	vec3 cross0 = cross(b - a, p - a);
-	vec3 cross1 = cross(b - a, c - a);
+	Vec3 cross0 = cross(b - a, p - a);
+	Vec3 cross1 = cross(b - a, c - a);
 
 	return dot(cross0, cross1) >= 0;
 }
 
-cube::cube(const vec3& Q, const double length) : Q(Q), length(length)
-{
-	faces[0] = quad(Q, vec3(length, 0.0, 0.0), vec3(0.0, length, 0.0)); // Front face
-	faces[1] = quad(Q, vec3(length, 0.0, 0.0), vec3(0.0, 0.0, length)); // Lower face
-	faces[2] = quad(Q, vec3(0.0, 0.0, length), vec3(0.0, length, 0.0)); // Left face
-	faces[3] = quad(Q + vec3(0.0, 0.0, length),							// Back face
-					vec3(length, 0.0, 0.0),
-					vec3(0.0, length, 0.0));
-	faces[4] = quad(Q + vec3(0.0, length, 0.0),							// Top face
-					vec3(length, 0.0, 0.0),
-					vec3(0.0, 0.0, length));							
-	faces[5] = quad(Q + vec3(length, 0.0, 0.0),							// Right face
-					vec3(0.0, 0.0, length),
-					vec3(0.0, length, 0.0));
+Cube::Cube(const Vec3& Q, const double length) : Q(Q), length(length) {
+	faces[0] = Quad(Q, Vec3(length, 0.0, 0.0), Vec3(0.0, length, 0.0)); // Front face
+	faces[1] = Quad(Q, Vec3(length, 0.0, 0.0), Vec3(0.0, 0.0, length)); // Lower face
+	faces[2] = Quad(Q, Vec3(0.0, 0.0, length), Vec3(0.0, length, 0.0)); // Left face
+	faces[3] = Quad(Q + Vec3(0.0, 0.0, length),							// Back face
+					Vec3(length, 0.0, 0.0),
+					Vec3(0.0, length, 0.0));
+	faces[4] = Quad(Q + Vec3(0.0, length, 0.0),							// Top face
+					Vec3(length, 0.0, 0.0),
+					Vec3(0.0, 0.0, length));							
+	faces[5] = Quad(Q + Vec3(length, 0.0, 0.0),							// Right face
+					Vec3(0.0, 0.0, length),
+					Vec3(0.0, length, 0.0));
 
 	face_hit = -1;
 }
 
-cube::cube(
-	const vec3& Q,
-	const vec3& u,
-	const vec3& v,
-	const vec3& w,
-	const double length
-)
-{
+Cube::Cube(const Vec3& Q, const Vec3& u,
+		   const Vec3& v, const Vec3& w,
+		   const double length) {
 	this->Q = Q;
 	this->length = length;
 
-	vec3 u_scaled = u / u.length() * length;
-	vec3 v_scaled = v / v.length() * length;
-	vec3 w_scaled = w / w.length() * length;
+	Vec3 u_scaled = u / u.length() * length;
+	Vec3 v_scaled = v / v.length() * length;
+	Vec3 w_scaled = w / w.length() * length;
 
-	faces[0] = quad(Q, u_scaled, v_scaled);
-	faces[1] = quad(Q, u_scaled, w_scaled);
-	faces[2] = quad(Q, w_scaled, v_scaled);
-	faces[3] = quad(Q + w_scaled, u_scaled, v_scaled);
-	faces[4] = quad(Q + v_scaled, u_scaled, w_scaled);
-	faces[5] = quad(Q + u_scaled, w_scaled, v_scaled);
+	faces[0] = Quad(Q, u_scaled, v_scaled);
+	faces[1] = Quad(Q, u_scaled, w_scaled);
+	faces[2] = Quad(Q, w_scaled, v_scaled);
+	faces[3] = Quad(Q + w_scaled, u_scaled, v_scaled);
+	faces[4] = Quad(Q + v_scaled, u_scaled, w_scaled);
+	faces[5] = Quad(Q + u_scaled, w_scaled, v_scaled);
 
 	face_hit = -1;
 }
 
-bool cube::hit(ray& r, double t_min, double t_max, double& t)
-{
+bool Cube::hit(Ray& r, double t_min, double t_max, double& t) {
 	int n = faces.size();
 	int closestFace = -1;
 	double closest_t = big;
@@ -234,7 +214,6 @@ bool cube::hit(ray& r, double t_min, double t_max, double& t)
 	return true;
 }
 
-void cube::scatter(ray& r_in, double t, vec3& p, vec3& n)
-{
+void Cube::scatter(Ray& r_in, double t, Vec3& p, Vec3& n) {
 	faces[face_hit].scatter(r_in, t, p, n);
 }

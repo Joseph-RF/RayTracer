@@ -4,72 +4,47 @@
 #include "ray.h"
 #include "shape.h"
 
-class material
+class Material
 {
 public:
-	virtual bool scatter(
-		ray& r_in,
-		vec3& p,
-		vec3& n,
-		ray& r_out
-	) = 0;
+	virtual bool scatter(Ray& r_in, Vec3& p, Vec3& n, Ray& r_out) = 0;
 
-	colour albedo;
+	Colour albedo;
 };
 
-class diffuse : public material
+class Diffuse : public Material
 {
 public:
-	diffuse(colour albedo);
+	Diffuse(Colour albedo);
 
-	bool scatter(
-		ray& r_in,
-		vec3& p,
-		vec3& n,
-		ray& r_out
-	);
+	bool scatter(Ray& r_in, Vec3& p, Vec3& n, Ray& r_out);
 };
 
-class metal : public material
+class Metal : public Material
 {
 public:
-	metal(colour albedo);
+	Metal(Colour albedo);
 
-	bool scatter(
-		ray& r_in,
-		vec3& p,
-		vec3& n,
-		ray& r_out
-	);
+	bool scatter(Ray& r_in, Vec3& p, Vec3& n, Ray& r_out);
 };
 
-class dielectric : public material
+class Dielectric : public Material
 {
 public:
-	dielectric(colour albedo, double rindex);
+	Dielectric(Colour albedo, double rindex);
 
-	bool scatter(
-		ray& r_in,
-		vec3& p,
-		vec3& n,
-		ray& r_out
-	);
+	bool scatter(Ray& r_in, Vec3& p, Vec3& n, Ray& r_out);
 
 private:
 	double rindex;
 };
 
-class light : public material
+class Light : public Material
 {
 public:
-	light(colour emission);
+	Light(Colour emission);
 
-	bool scatter(
-		ray& r_in,
-		vec3& p,
-		vec3& n,
-		ray& r_out
-	);
+	bool scatter(Ray& r_in, Vec3& p, Vec3& n, Ray& r_out);
 };
 
 // at least 4 sets to failure in a week separated across 2 days
