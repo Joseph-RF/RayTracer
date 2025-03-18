@@ -17,6 +17,7 @@
 #include "material.h"
 #include "hittable.h"
 #include "camera.h"
+#include "interval.h"
 
 void spheresScene();
 void cornellBox();
@@ -27,13 +28,10 @@ void render(int total_thread_count, int thread_num);
 Colour traceRay(
 	Ray& r,
 	std::vector<std::shared_ptr<Hittable>>& hittable_list,
-	double t_min,
-	double t_max,
+	Interval t_range,
 	int depth
 );
 
-double infinity = std::numeric_limits<double>::infinity();
-double small_amount = 0.000001;
 double max_depth = 10;
 
 const int width = 800;
@@ -57,7 +55,7 @@ int main() {
 
 	// Render the scene
 
-	/*
+	
 	int threadCount = 6;
 	std::thread worker_0(render, threadCount, 0);
 	std::thread worker_1(render, threadCount, 1);
@@ -72,9 +70,9 @@ int main() {
 	worker_3.join();
 	worker_4.join();
 	worker_5.join();
-	*/
+	
 
-	render(1, 0);
+	//render(1, 0);
 
 	// Create the sprite that will be displayed on window
 	sf::Image render_image;
@@ -254,7 +252,7 @@ void render(int total_thread_count, int thread_num) {
 				double v_y = ((j + random_num()) - height / 2.0) / (height) * 1.0;
 
 				Ray r(cam.position, v_x * cam.u + v_y * cam.v + cam.d * cam.w);
-				pixel_Colour += traceRay(r, hittables, small_amount, infinity, 1);
+				pixel_Colour += traceRay(r, hittables, Interval(small, big), 1);
 			}
 
 			pixel_Colour *= cam.pixel_sampling_factor;
@@ -268,20 +266,19 @@ void render(int total_thread_count, int thread_num) {
 Colour traceRay(
 	Ray& r,
 	std::vector<std::shared_ptr<Hittable>>& hittable_list,
-	double t_min,
-	double t_max,
+	Interval t_range,
 	int depth) {
 
 	if (depth >= max_depth) {
 		return Colour(0.0, 0.0, 0.0);
 	}
 
-	double closest_t = infinity;
+	double closest_t = big;
 	double t = 0.0;
 	std::shared_ptr<Hittable> closest_hittable = nullptr;
 
 	for (std::shared_ptr<Hittable> hittable : hittable_list) {
-		if (hittable->hit(r, t_min, t_max, t)) {
+		if (hittable->hit(r, t_range, t)) {
 			if (t < closest_t) {
 				closest_t = t;
 				closest_hittable = hittable;
@@ -303,5 +300,5 @@ Colour traceRay(
 		return hit_colour;
 	}
 
-	return hit_colour * traceRay(scattered, hittable_list, t_min, t_max, depth + 1);
+	return hit_colour * traceRay(scattered, hittable_list, t_range, depth + 1);
 }

@@ -143,8 +143,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="aabb.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="hittable.cpp" />
+    <ClCompile Include="interval.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="pixelmap.cpp" />
     <ClCompile Include="ray.cpp" />
@@ -153,8 +155,10 @@
     <ClCompile Include="vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aabb.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="hittable.h" />
+    <ClInclude Include="interval.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="pixelmap.h" />
     <ClInclude Include="ray.h" />

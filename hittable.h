@@ -4,6 +4,7 @@
 #include "ray.h"
 #include "shape.h"
 #include "material.h"
+#include "interval.h"
 
 class Hittable
 {
@@ -13,7 +14,7 @@ public:
 		std::shared_ptr<Material> mat
 	);
 
-	bool hit(Ray& r, double t_min, double t_max, double& t);
+	bool hit(Ray& r, Interval t_range, double& t);
 	bool scatter(Ray& r_in, double t, Ray& r_out, Colour& attenuation);
 
 private:

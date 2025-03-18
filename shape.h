@@ -4,13 +4,15 @@
 
 #include "vec3.h"
 #include "material.h"
+#include "interval.h"
+#include "aabb.h"
 
 class Material;
 
 class Shape
 {
 public:
-	virtual bool hit(Ray& r, double t_min, double t_max, double& t) = 0;
+	virtual bool hit(Ray& r, Interval t_range, double& t) = 0;
 	virtual void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) = 0;
 };
 
@@ -20,11 +22,14 @@ public:
 	Sphere();
 	Sphere(const Vec3& position, const double radius);
 
-	bool hit(Ray& r, double t_min, double t_max, double& t) override;
+	bool hit(Ray& r, Interval t_range, double& t) override;
 	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
+
+	void bounding_box();
 
 	Vec3 position;
 	double radius;
+	AABB bbox;
 };
 
 class Quad : public Shape
@@ -33,13 +38,16 @@ public:
 	Quad();
 	Quad(const Vec3& Q, const Vec3& u, const Vec3& v);
 
-	bool hit(Ray& r, double t_min, double t_max, double& t) override;
+	bool hit(Ray& r, Interval t_range, double& t) override;
 	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
+
+	void bounding_box();
 
 private:
 	Vec3 Q;
 	Vec3 u;
 	Vec3 v;
+	AABB bbox;
 
 	std::vector<Vec3> vertices = std::vector<Vec3>(4);
 
@@ -51,13 +59,16 @@ class Triangle : public Shape
 public:
 	Triangle(const Vec3& Q, const Vec3& u, const Vec3& v);
 
-	bool hit(Ray& r, double t_min, double t_max, double& t) override;
+	bool hit(Ray& r, Interval t_range, double& t) override;
 	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
+
+	void bounding_box();
 
 private:
 	Vec3 Q;
 	Vec3 u;
 	Vec3 v;
+	AABB bbox;
 
 	std::vector<Vec3> vertices = std::vector<Vec3>(3);
 
@@ -72,12 +83,15 @@ public:
 		 const Vec3& v, const Vec3& w,
 		 const double length);
 
-	bool hit(Ray& r, double t_min, double t_max, double& t) override;
+	bool hit(Ray& r, Interval t_range, double& t) override;
 	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
+
+	void bounding_box();
 
 private:
 	Vec3 Q;
 	double length;
+	AABB bbox;
 	
 	std::vector<Quad> faces = std::vector<Quad>(6);
 	// Used to pass the information from hit function to scatter function

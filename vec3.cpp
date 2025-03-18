@@ -16,6 +16,13 @@ double Vec3::get_y() const {return y;}
 
 double Vec3::get_z() const {return z;}
 
+double Vec3::get_axis(int index) const
+{
+	if (index == 0) { return x; }
+	if (index == 1) { return y; }
+	return z;
+}
+
 void Vec3::set_x(double x) {this->x = x;}
 
 void Vec3::set_y(double y) {this->y = y;}

@@ -6,9 +6,10 @@ Sphere::Sphere() : radius(0.0) {
 
 Sphere::Sphere(const Vec3& position, const double radius) 
 	: position(position), radius(radius) {
+	bounding_box();
 }
 
-bool Sphere::hit(Ray& r, double t_min, double t_max, double& t) {
+bool Sphere::hit(Ray& r, Interval t_range, double& t) {
 	double closest_t = big;
 
 	Vec3 OC = r.origin - position;
@@ -27,10 +28,10 @@ bool Sphere::hit(Ray& r, double t_min, double t_max, double& t) {
 	double t1 = (-b + discriminant_sqrt) / (2 * a);
 	double t2 = (-b - discriminant_sqrt) / (2 * a);
 
-	if (t1 > t_min && t1 < t_max && t1 < closest_t) {
+	if (t_range.contains_exclusive(t1) && t1 < closest_t) {
 		closest_t = t1;
 	}
-	if (t2 > t_min && t2 < t_max && t2 < closest_t) {
+	if (t_range.contains_exclusive(t2) && t2 < closest_t) {
 		closest_t = t2;
 	}
 	t = closest_t;
@@ -49,6 +50,12 @@ void Sphere::scatter(Ray& r_in, double t, Vec3& p, Vec3& n) {
 	n = normal;
 }
 
+void Sphere::bounding_box()
+{
+	Vec3 radius_vector(radius, radius, radius);
+	bbox = AABB(position - radius_vector, position + radius_vector);
+}
+
 Quad::Quad() {
 	vertices = std::vector<Vec3>(4);
 }
@@ -61,9 +68,11 @@ Quad::Quad(const Vec3& Q, const Vec3& u, const Vec3& v)
 	vertices[3] = Q + v;
 
 	normal = cross(u, v);
+
+	bounding_box();
 }
 
-bool Quad::hit(Ray& r, double t_min, double t_max, double& t) {
+bool Quad::hit(Ray& r, Interval t_range, double& t) {
 	double denom = dot(normal, r.direction);
 
 	// Get rid of values that are too close to being parallel
@@ -73,7 +82,7 @@ bool Quad::hit(Ray& r, double t_min, double t_max, double& t) {
 
 	t = (dot(normal, Q) - dot(normal, r.origin)) / denom;
 
-	if (t < t_min || t > t_max) {
+	if (!t_range.contains_exclusive(t)) {
 		return false;
 	}
 
@@ -89,6 +98,18 @@ void Quad::scatter(Ray& r_in, double t, Vec3& p, Vec3& n) {
 	}
 }
 
+void Quad::bounding_box()
+{
+	// to create the bounding box for a quad, create a bbox using
+	//one axis and create another using the second axis.
+	// combine the two bounding boxes to create an overall bounding box
+
+	AABB bbox1(Q, Q + u + v);
+	AABB bbox2(Q + u, Q + v);
+
+	bbox = AABB(bbox1, bbox2);
+}
+
 Triangle::Triangle(const Vec3& Q, const Vec3& u, const Vec3& v)
 	: Q(Q), u(u), v(v) {
 	vertices[0] = Q;
@@ -96,9 +117,11 @@ Triangle::Triangle(const Vec3& Q, const Vec3& u, const Vec3& v)
 	vertices[2] = Q + v;
 
 	normal = cross(u, v);
+
+	bounding_box();
 }
 
-bool Triangle::hit(Ray& r, double t_min, double t_max, double& t) {
+bool Triangle::hit(Ray& r, Interval t_range, double& t) {
 	double denom = dot(normal, r.direction);
 
 	// Get rid of values that are too close to being parallel
@@ -108,7 +131,7 @@ bool Triangle::hit(Ray& r, double t_min, double t_max, double& t) {
 
 	t = (dot(normal, Q) - dot(normal, r.origin)) / denom;
 
-	if (t < t_min || t > t_max) {
+	if (!t_range.contains_exclusive(t)) {
 		return false;
 	}
 
@@ -122,6 +145,16 @@ void Triangle::scatter(Ray& r_in, double t, Vec3& p, Vec3& n) {
 	if (dot(r_in.direction, n) > 0) {
 		n = -n;
 	}
+}
+
+void Triangle::bounding_box()
+{
+	// refer to bounding_box method for quad for details on bounding box
+	//construction of flat shapes.
+	AABB bbox1(Q, Q + u + v);
+	AABB bbox2(Q + u, Q + v);
+
+	bbox = AABB(bbox1, bbox2);
 }
 
 bool interior(const std::vector<Vec3>& vertices, const Vec3& p) {
@@ -187,13 +220,13 @@ Cube::Cube(const Vec3& Q, const Vec3& u,
 	face_hit = -1;
 }
 
-bool Cube::hit(Ray& r, double t_min, double t_max, double& t) {
+bool Cube::hit(Ray& r, Interval t_range, double& t) {
 	int n = faces.size();
 	int closestFace = -1;
 	double closest_t = big;
 
 	for (int i = 0; i < n; ++i) {
-		if (faces[i].hit(r, t_min, t_max, t)) {
+		if (faces[i].hit(r, t_range, t)) {
 			if (t < closest_t) {
 				closest_t = t;
 				closestFace = i;
@@ -205,7 +238,7 @@ bool Cube::hit(Ray& r, double t_min, double t_max, double& t) {
 		return false;
 	}
 
-	if (t < t_min || t > t_max) {
+	if (!t_range.contains_exclusive(t)) {
 		return false;
 	}
 
