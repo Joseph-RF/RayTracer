@@ -34,7 +34,7 @@ public:
 	double length_sq();
 	Vec3 normalise();
 
-	Vec3 y_rotation(const double angle_degrees);
+	Vec3 y_rotation(const double angle_degrees) const;
 
 	void clampColour();
 
@@ -64,6 +64,7 @@ const double pi = 3.141592;
 // Not strictly Vec3
 static std::random_device rd;
 
+int random_int(int a, int b);
 double random_num();
 double random_num(double a, double b);
 

@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="aabb.cpp" />
+    <ClCompile Include="bvhnode.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="hittable.cpp" />
     <ClCompile Include="interval.cpp" />
@@ -156,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aabb.h" />
+    <ClInclude Include="bvhnode.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="hittable.h" />
     <ClInclude Include="interval.h" />

@@ -29,6 +29,11 @@ Dielectric::Dielectric(Colour albedo, double rindex) : rindex(rindex) {
 }
 
 bool Dielectric::scatter(Ray& r_in, Vec3& p, Vec3& n, Ray& r_out) {
+	// Use dielectric's transmittance factor T. Where T = 1 - R. R being
+	//reflectance. They are the proportion of rays that are transmitted T
+	//and reflected R
+	// If this ray is transmitted, refract it. Need to check for crit angles
+	// If this ray is reflected, reflect it.
 	return true;
 }
 

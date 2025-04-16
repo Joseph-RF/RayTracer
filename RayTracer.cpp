@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <thread>
+#include <chrono>
 
 #include "SFML/System.hpp"
 #include "SFML/Graphics.hpp"
@@ -18,16 +19,35 @@
 #include "hittable.h"
 #include "camera.h"
 #include "interval.h"
+#include "bvhnode.h"
 
 void spheresScene();
 void cornellBox();
 void singleBox();
 
+void addCuboid(
+	const Vec3& pos,
+	const Vec3& size,
+	const double y_rot,
+	std::shared_ptr<Material> mat,
+	std::vector<std::shared_ptr<Hittable>>& hittable_list
+);
+
 void render(int total_thread_count, int thread_num);
 
+/*
+* OLD TRACE RAY WITH LIST
 Colour traceRay(
 	Ray& r,
 	std::vector<std::shared_ptr<Hittable>>& hittable_list,
+	Interval t_range,
+	int depth
+);
+*/
+
+Colour traceRay(
+	Ray& r,
+	BVHNode& hittable_tree,
 	Interval t_range,
 	int depth
 );
@@ -43,19 +63,24 @@ Camera cam;
 PixelMap pm(width, height);
 
 std::vector<std::shared_ptr<Hittable>> hittables;
+BVHNode world;
 
 int main() {
     sf::VideoMode video_mode(width, height);
     sf::RenderWindow window(video_mode, "RayTracer", sf::Style::Close);
 	sf::Event e;
 
-	//SpheresScene();
+	auto start = std::chrono::system_clock::now();
+
+	//spheresScene();
 	cornellBox();
 	//singleBox();
 
+	// After creating objects, create BVH tree using the list
+	world = BVHNode(hittables);
+
 	// Render the scene
 
-	
 	int threadCount = 6;
 	std::thread worker_0(render, threadCount, 0);
 	std::thread worker_1(render, threadCount, 1);
@@ -63,14 +88,19 @@ int main() {
 	std::thread worker_3(render, threadCount, 3);
 	std::thread worker_4(render, threadCount, 4);
 	std::thread worker_5(render, threadCount, 5);
-
+	
 	worker_0.join();
 	worker_1.join();
 	worker_2.join();
 	worker_3.join();
 	worker_4.join();
 	worker_5.join();
-	
+
+	auto end = std::chrono::system_clock::now();
+
+	double time_elapsed = std::chrono::duration_cast<
+		std::chrono::duration<double>>(end - start).count();
+	std::cout << "Render time: " << time_elapsed << std::endl;
 
 	//render(1, 0);
 
@@ -177,26 +207,8 @@ void cornellBox() {
 	std::shared_ptr<Quad> wall4 = std::make_shared<Quad>(Vec3(0, 0, 2), Vec3(2, 0, 0), Vec3(0, 2, 0));
 	std::shared_ptr<Quad> light_body = std::make_shared<Quad>(Vec3(1.24, 1.99, 1.22), Vec3(-0.47, 0, 0), Vec3(0, 0, -0.38));
 
-	Vec3 u(1.0, 0.0, 0.0);
-	Vec3 v(0.0, 1.0, 0.0);
-	Vec3 w(0.0, 0.0, 1.0);
-	double angle = 60.0;
-
-	std::shared_ptr<Cube> block0 = std::make_shared<Cube>(
-		Vec3(0.2, 0.0, 1.0),
-		u.y_rotation(angle),
-		v.y_rotation(angle),
-		w.y_rotation(angle),
-		0.5);
-
-	angle = -45.0;
-
-	std::shared_ptr<Cube> block1 = std::make_shared<Cube>(
-		Vec3(1.5, 0.0, 0.5),
-		u.y_rotation(angle),
-		v.y_rotation(angle),
-		w.y_rotation(angle),
-		0.5);
+	addCuboid(Vec3(0.2, 0.0, 1.0), Vec3(0.5, 0.5, 0.5), 60.0, white, hittables);
+	addCuboid(Vec3(1.5, 0.0, 0.5), Vec3(0.5, 0.5, 0.5), -45.0, shiny_metal, hittables);
 
 	hittables.push_back(std::make_shared<Hittable>(
 		wall0, red));
@@ -210,10 +222,6 @@ void cornellBox() {
 		wall4, white));
 	hittables.push_back(std::make_shared<Hittable>(
 		light_body, white_light));
-	hittables.push_back(std::make_shared<Hittable>(
-		block0, white));
-	hittables.push_back(std::make_shared<Hittable>(
-		block1, shiny_metal));
 }
 
 void singleBox() {
@@ -242,6 +250,32 @@ void singleBox() {
 		block0, white));
 }
 
+void addCuboid(
+	const Vec3& pos,
+	const Vec3& size,
+	const double y_rot,
+	std::shared_ptr<Material> mat,
+	std::vector<std::shared_ptr<Hittable>>& hittable_list) {
+
+	const Vec3 dx = Vec3(size.get_x(), 0.0, 0.0).y_rotation(y_rot);
+	const Vec3 dy = Vec3(0.0, size.get_y(), 0.0).y_rotation(y_rot);
+	const Vec3 dz = Vec3(0.0, 0.0, size.get_z()).y_rotation(y_rot);
+
+	std::shared_ptr<Quad> face0 = std::make_shared<Quad>(pos, dx, dy);
+	std::shared_ptr<Quad> face1 = std::make_shared<Quad>(pos, dx, dz);
+	std::shared_ptr<Quad> face2 = std::make_shared<Quad>(pos, dz, dy);
+	std::shared_ptr<Quad> face3 = std::make_shared<Quad>(pos + dz, dx, dy);
+	std::shared_ptr<Quad> face4 = std::make_shared<Quad>(pos + dy, dx, dz);
+	std::shared_ptr<Quad> face5 = std::make_shared<Quad>(pos + dx, dz, dy);
+
+	hittable_list.push_back(std::make_shared<Hittable>(face0, mat));
+	hittable_list.push_back(std::make_shared<Hittable>(face1, mat));
+	hittable_list.push_back(std::make_shared<Hittable>(face2, mat));
+	hittable_list.push_back(std::make_shared<Hittable>(face3, mat));
+	hittable_list.push_back(std::make_shared<Hittable>(face4, mat));
+	hittable_list.push_back(std::make_shared<Hittable>(face5, mat));
+}
+
 void render(int total_thread_count, int thread_num) {
 	// Render the scene
 	for (int j = thread_num; j < height; j += total_thread_count) {
@@ -252,7 +286,7 @@ void render(int total_thread_count, int thread_num) {
 				double v_y = ((j + random_num()) - height / 2.0) / (height) * 1.0;
 
 				Ray r(cam.position, v_x * cam.u + v_y * cam.v + cam.d * cam.w);
-				pixel_Colour += traceRay(r, hittables, Interval(small, big), 1);
+				pixel_Colour += traceRay(r, world, Interval(small, big), 1);
 			}
 
 			pixel_Colour *= cam.pixel_sampling_factor;
@@ -265,7 +299,7 @@ void render(int total_thread_count, int thread_num) {
 
 Colour traceRay(
 	Ray& r,
-	std::vector<std::shared_ptr<Hittable>>& hittable_list,
+	BVHNode& hittable_tree,
 	Interval t_range,
 	int depth) {
 
@@ -276,8 +310,9 @@ Colour traceRay(
 	double closest_t = big;
 	double t = 0.0;
 	std::shared_ptr<Hittable> closest_hittable = nullptr;
-
-	for (std::shared_ptr<Hittable> hittable : hittable_list) {
+	
+	/*
+	for (std::shared_ptr<Hittable> hittable : hittables) {
 		if (hittable->hit(r, t_range, t)) {
 			if (t < closest_t) {
 				closest_t = t;
@@ -285,11 +320,14 @@ Colour traceRay(
 			}
 		}
 	}
+	*/
+	
+	closest_hittable = hittable_tree.hit(r, t_range, closest_t);
 
 	if (closest_hittable == nullptr) {
 		// Colour of the background / sky
-		return Colour(0.0, 0.0, 0.0);
-		//return Colour(0.7, 0.9, 1.0) * 0.8;
+		//return Colour(0.0, 0.0, 0.0);
+		return Colour(0.7, 0.9, 1.0) * 0.8;
 		//return Colour(0.1, 0.1, 0.1);
 	}
 	
@@ -300,5 +338,5 @@ Colour traceRay(
 		return hit_colour;
 	}
 
-	return hit_colour * traceRay(scattered, hittable_list, t_range, depth + 1);
+	return hit_colour * traceRay(scattered, hittable_tree, t_range, depth + 1);
 }

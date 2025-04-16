@@ -18,3 +18,8 @@ bool Hittable::scatter(Ray& r_in, double t, Ray& r_out, Colour& attenuation) {
 	attenuation = mat->albedo;
 	return mat->scatter(r_in, pos, normal, r_out);
 }
+
+AABB Hittable::get_bounding_box()
+{
+	return body->get_bounding_box();
+}

@@ -14,6 +14,8 @@ class Shape
 public:
 	virtual bool hit(Ray& r, Interval t_range, double& t) = 0;
 	virtual void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) = 0;
+
+	virtual AABB get_bounding_box() = 0;
 };
 
 class Sphere : public Shape
@@ -24,6 +26,8 @@ public:
 
 	bool hit(Ray& r, Interval t_range, double& t) override;
 	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
+
+	AABB get_bounding_box() override;
 
 	void bounding_box();
 
@@ -40,6 +44,8 @@ public:
 
 	bool hit(Ray& r, Interval t_range, double& t) override;
 	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
+
+	AABB get_bounding_box() override;
 
 	void bounding_box();
 
@@ -61,6 +67,8 @@ public:
 
 	bool hit(Ray& r, Interval t_range, double& t) override;
 	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
+
+	AABB get_bounding_box() override;
 
 	void bounding_box();
 
@@ -85,6 +93,8 @@ public:
 
 	bool hit(Ray& r, Interval t_range, double& t) override;
 	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
+
+	AABB get_bounding_box() override;
 
 	void bounding_box();
 

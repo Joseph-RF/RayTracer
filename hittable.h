@@ -17,6 +17,8 @@ public:
 	bool hit(Ray& r, Interval t_range, double& t);
 	bool scatter(Ray& r_in, double t, Ray& r_out, Colour& attenuation);
 
+	AABB get_bounding_box();
+
 private:
 	std::shared_ptr<Shape> body;
 	std::shared_ptr<Material> mat;

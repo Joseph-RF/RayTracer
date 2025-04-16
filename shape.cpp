@@ -10,7 +10,11 @@ Sphere::Sphere(const Vec3& position, const double radius)
 }
 
 bool Sphere::hit(Ray& r, Interval t_range, double& t) {
+	// [Done, add to commit message] Need to adjust for the case where the upper edge of t_range is the closer of t1 / t2
+	// So, hit is registered, but because it isn't in the valid range, closest_t never set
+	//to either t1 nor t2 resulting in closest_t remaining as infinity, t is set to infinity
 	double closest_t = big;
+	bool ray_hit = false;
 
 	Vec3 OC = r.origin - position;
 	double a = dot(r.direction, r.direction);
@@ -30,13 +34,15 @@ bool Sphere::hit(Ray& r, Interval t_range, double& t) {
 
 	if (t_range.contains_exclusive(t1) && t1 < closest_t) {
 		closest_t = t1;
+		ray_hit = true;
 	}
 	if (t_range.contains_exclusive(t2) && t2 < closest_t) {
 		closest_t = t2;
+		ray_hit = true;
 	}
 	t = closest_t;
 
-	return true;
+	return ray_hit;
 }
 
 void Sphere::scatter(Ray& r_in, double t, Vec3& p, Vec3& n) {
@@ -50,8 +56,11 @@ void Sphere::scatter(Ray& r_in, double t, Vec3& p, Vec3& n) {
 	n = normal;
 }
 
-void Sphere::bounding_box()
-{
+AABB Sphere::get_bounding_box() {
+	return bbox;
+}
+
+void Sphere::bounding_box() {
 	Vec3 radius_vector(radius, radius, radius);
 	bbox = AABB(position - radius_vector, position + radius_vector);
 }
@@ -98,8 +107,11 @@ void Quad::scatter(Ray& r_in, double t, Vec3& p, Vec3& n) {
 	}
 }
 
-void Quad::bounding_box()
-{
+AABB Quad::get_bounding_box() {
+	return bbox;
+}
+
+void Quad::bounding_box() {
 	// to create the bounding box for a quad, create a bbox using
 	//one axis and create another using the second axis.
 	// combine the two bounding boxes to create an overall bounding box
@@ -147,8 +159,11 @@ void Triangle::scatter(Ray& r_in, double t, Vec3& p, Vec3& n) {
 	}
 }
 
-void Triangle::bounding_box()
-{
+AABB Triangle::get_bounding_box() {
+	return bbox;
+}
+
+void Triangle::bounding_box() {
 	// refer to bounding_box method for quad for details on bounding box
 	//construction of flat shapes.
 	AABB bbox1(Q, Q + u + v);
@@ -249,4 +264,16 @@ bool Cube::hit(Ray& r, Interval t_range, double& t) {
 
 void Cube::scatter(Ray& r_in, double t, Vec3& p, Vec3& n) {
 	faces[face_hit].scatter(r_in, t, p, n);
+}
+
+AABB Cube::get_bounding_box() {
+	return bbox;
+}
+
+void Cube::bounding_box() {
+	bbox = AABB(faces[0].get_bounding_box(), faces[1].get_bounding_box());
+	bbox = AABB(bbox, faces[2].get_bounding_box());
+	bbox = AABB(bbox, faces[3].get_bounding_box());
+	bbox = AABB(bbox, faces[4].get_bounding_box());
+	bbox = AABB(bbox, faces[5].get_bounding_box());
 }

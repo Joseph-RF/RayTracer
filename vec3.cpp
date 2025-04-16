@@ -82,7 +82,7 @@ Vec3 Vec3::normalise() {
 	return Vec3(x, y, z) / this->length();
 }
 
-Vec3 Vec3::y_rotation(const double angle_degrees) {
+Vec3 Vec3::y_rotation(const double angle_degrees) const {
 	double angle_radians = angle_degrees * pi / 180.0;
 	double sin_theta = std::sin(angle_radians);
 	double cos_theta = std::cos(angle_radians);
@@ -168,6 +168,15 @@ Vec3 reflect(const Vec3& a, const Vec3 b) {
 	double a_dot_b = dot(a, b);
 
 	return a - 2 * a_dot_b * b;
+}
+
+int random_int(int a, int b) {
+	// Note, a and b are inclusive.
+	//i.e. a, a + 1, a + 2, ... , b could be returned
+	std::uniform_int_distribution<> dist(a, b);
+	static std::mt19937 generator;
+
+	return dist(generator);
 }
 
 double random_num() {
