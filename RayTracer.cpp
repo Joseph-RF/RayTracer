@@ -197,6 +197,7 @@ void cornellBox() {
 	std::shared_ptr<Diffuse> green = std::make_shared<Diffuse>(Colour(0.12, 0.45, 0.15));
 	std::shared_ptr<Light> white_light = std::make_shared<Light>(Colour(15, 15, 15));
 	std::shared_ptr<Metal> shiny_metal = std::make_shared<Metal>(Colour(0.8, 0.8, 0.8));
+	std::shared_ptr<Dielectric> glass = std::make_shared<Dielectric>(Colour(1.0, 1.0, 1.0), 1.4);
 
 	std::shared_ptr<Quad> wall0 = std::make_shared<Quad>(Vec3(2, 0, 0), Vec3(0, 2, 0), Vec3(0, 0, 2));
 	std::shared_ptr<Quad> wall1 = std::make_shared<Quad>(Vec3(0, 0, 0), Vec3(0, 2, 0), Vec3(0, 0, 2));
@@ -207,13 +208,15 @@ void cornellBox() {
 	std::shared_ptr<Quad> wall4 = std::make_shared<Quad>(Vec3(0, 0, 2), Vec3(2, 0, 0), Vec3(0, 2, 0));
 	std::shared_ptr<Quad> light_body = std::make_shared<Quad>(Vec3(1.24, 1.99, 1.22), Vec3(-0.47, 0, 0), Vec3(0, 0, -0.38));
 
-	addCuboid(Vec3(0.2, 0.0, 1.0), Vec3(0.5, 0.5, 0.5), 60.0, white, hittables);
-	addCuboid(Vec3(1.5, 0.0, 0.5), Vec3(0.5, 0.5, 0.5), -45.0, shiny_metal, hittables);
+	std::shared_ptr<Sphere> left_sphere = std::make_shared<Sphere>(Vec3(0.5, 0.5, 1.0), 0.4);
+
+	//addCuboid(Vec3(0.2, 0.0, 1.0), Vec3(0.5, 0.5, 0.5), 60.0, white, hittables);
+	addCuboid(Vec3(1.5, 0.0, 0.5), Vec3(0.5, 0.5, 0.5), -45.0, white, hittables);
 
 	hittables.push_back(std::make_shared<Hittable>(
-		wall0, red));
+		wall0, green));
 	hittables.push_back(std::make_shared<Hittable>(
-		wall1, green));
+		wall1, red));
 	hittables.push_back(std::make_shared<Hittable>(
 		wall2, white));
 	hittables.push_back(std::make_shared<Hittable>(
@@ -222,6 +225,8 @@ void cornellBox() {
 		wall4, white));
 	hittables.push_back(std::make_shared<Hittable>(
 		light_body, white_light));
+	hittables.push_back(std::make_shared<Hittable>(
+		left_sphere, glass));
 }
 
 void singleBox() {

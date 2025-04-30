@@ -57,7 +57,8 @@ Vec3 cross(const Vec3& u, const Vec3& v);
 
 Vec3 random_unit_vector();
 
-Vec3 reflect(const Vec3& a, const Vec3 b);
+Vec3 reflect(const Vec3& a, const Vec3& b);
+Vec3 refract(const Vec3& d, const Vec3& n, const double rindexin_over_rindexout);
 
 const double pi = 3.141592;
 

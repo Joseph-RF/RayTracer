@@ -164,10 +164,20 @@ Vec3 random_unit_vector() {
 	}
 }
 
-Vec3 reflect(const Vec3& a, const Vec3 b) {
+Vec3 reflect(const Vec3& a, const Vec3& b) {
 	double a_dot_b = dot(a, b);
 
 	return a - 2 * a_dot_b * b;
+}
+
+Vec3 refract(const Vec3& d, const Vec3& n, const double rindexin_over_rindexout)
+{
+	// Both vectors are assumed to be normal and facing opposite each other
+	double d_dot_n = dot(d, n);
+	Vec3 t = rindexin_over_rindexout * (d - d_dot_n * n);
+	t = t - n * std::sqrt(1 - rindexin_over_rindexout * rindexin_over_rindexout *
+					  (1 - d_dot_n * d_dot_n));
+	return t;
 }
 
 int random_int(int a, int b) {

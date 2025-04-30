@@ -1,4 +1,5 @@
 #include "material.h"
+#include <iostream>
 
 Diffuse::Diffuse(Colour albedo) {
 	this->albedo = albedo;
@@ -29,12 +30,47 @@ Dielectric::Dielectric(Colour albedo, double rindex) : rindex(rindex) {
 }
 
 bool Dielectric::scatter(Ray& r_in, Vec3& p, Vec3& n, Ray& r_out) {
+	n = n / n.length();
+	
+	Vec3 unit_r_in_direction = r_in.direction.normalise();
+	double cos_theta = std::fmin(-dot(unit_r_in_direction, n), 1.0);
+	double sin_theta = std::sqrt(1 - cos_theta * cos_theta);
+
+	Vec3 direction;
+	double rindex_fraction = rindex;
+	if (!r_in.interior) {
+		rindex_fraction = 1.0 / rindex_fraction;
+	}
+
+	if (rindex_fraction * sin_theta > 1.0 || 
+		reflectance(cos_theta, rindex) > random_num()) {
+		// ReFLECted
+		direction = reflect(unit_r_in_direction, n);
+	}
+	else {
+		// ReFRACted
+		direction = refract(unit_r_in_direction, n, rindex_fraction);
+		if (r_in.interior) { r_out.interior = false; }
+		else { r_out.interior = true; }
+	}
+
+	r_out.direction = direction;
+	r_out.origin = p;
+
 	// Use dielectric's transmittance factor T. Where T = 1 - R. R being
 	//reflectance. They are the proportion of rays that are transmitted T
 	//and reflected R
 	// If this ray is transmitted, refract it. Need to check for crit angles
 	// If this ray is reflected, reflect it.
+	// Will assume for now that the exterior is always air
 	return true;
+}
+
+double Dielectric::reflectance(double cosine, double refraction_index) {
+	// Use Schlick's approximation for reflectance.
+	auto r0 = (1 - refraction_index) / (1 + refraction_index);
+	r0 = r0 * r0;
+	return r0 + (1 - r0) * std::pow((1 - cosine), 5);
 }
 
 Light::Light(Colour emission) {

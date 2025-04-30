@@ -37,6 +37,8 @@ public:
 
 private:
 	double rindex;
+
+	static double reflectance(double cos, double rindex);
 };
 
 class Light : public Material
