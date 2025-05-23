@@ -48,7 +48,3 @@ public:
 
 	bool scatter(Ray& r_in, Vec3& p, Vec3& n, Ray& r_out);
 };
-
-// at least 4 sets to failure in a week separated across 2 days
-// 1 g/kg - 1.5 g/kg
-// 8 sets , 1.3g/kg

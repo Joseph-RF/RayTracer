@@ -59,8 +59,7 @@ bool AABB::hit(const Ray& r, Interval t_range)
 		if (t0 < t1) {
 			if (t0 > t_range.min) { t_range.min = t0; }
 			if (t1 < t_range.max) { t_range.max = t1; }
-		}
-		else {
+		} else {
 			if (t1 > t_range.min) { t_range.min = t1; }
 			if (t0 < t_range.max) { t_range.max = t0; }
 		}

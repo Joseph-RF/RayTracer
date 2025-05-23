@@ -3,7 +3,7 @@
 BVHNode::BVHNode() {
 	// Consider getting rid of this default constructor.
 	// Error occurs when empty hittable_list is passed. Should fix
-	// Consider using INDICES instead of pointers to the objects. TEST
+	// Consider using INDICES instead of pointers to the objects. [Test]
 	left_node = nullptr;
 	right_node = nullptr;
 	left_hittable = nullptr;
@@ -51,7 +51,7 @@ BVHNode::BVHNode(
 	else {
 		isLeaf = false;
 		// Sort the list using one of the three axes chosen randomly
-		// SEE IF THERE IS A BETTER WAY TO DIVIDE
+		// Consider a better way to divide the tree.
 		int axis = random_int(0, 2);
 
 		// This lambda function is horrible to look at.
@@ -75,8 +75,7 @@ BVHNode::~BVHNode() {
 }
 
 std::shared_ptr<Hittable> BVHNode::hit(Ray& r, Interval t_range, double& t) {
-	// Improve names "left_hittable_hit
-	// See how removing temp_t affects the outcome once code works as intented
+
 	if (!bbox.hit(r, t_range)) {
 		return nullptr;
 	}

@@ -6,6 +6,8 @@
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <fstream>
+#include <sstream>
 
 #include "SFML/System.hpp"
 #include "SFML/Graphics.hpp"
@@ -23,7 +25,7 @@
 
 void spheresScene();
 void cornellBox();
-void singleBox();
+void cornellBoxMeshObj();
 
 void addCuboid(
 	const Vec3& pos,
@@ -35,21 +37,17 @@ void addCuboid(
 
 void render(int total_thread_count, int thread_num);
 
-/*
-* OLD TRACE RAY WITH LIST
-Colour traceRay(
-	Ray& r,
-	std::vector<std::shared_ptr<Hittable>>& hittable_list,
-	Interval t_range,
-	int depth
-);
-*/
-
 Colour traceRay(
 	Ray& r,
 	BVHNode& hittable_tree,
 	Interval t_range,
 	int depth
+);
+
+void loadObj(
+	std::vector<std::shared_ptr<Hittable>>& hittable_list,
+	std::shared_ptr<Material> mat,
+	const Vec3& position_offset
 );
 
 double max_depth = 10;
@@ -73,8 +71,8 @@ int main() {
 	auto start = std::chrono::system_clock::now();
 
 	//spheresScene();
-	cornellBox();
-	//singleBox();
+	//cornellBox();
+	cornellBoxMeshObj();
 
 	// After creating objects, create BVH tree using the list
 	world = BVHNode(hittables);
@@ -101,8 +99,6 @@ int main() {
 	double time_elapsed = std::chrono::duration_cast<
 		std::chrono::duration<double>>(end - start).count();
 	std::cout << "Render time: " << time_elapsed << std::endl;
-
-	//render(1, 0);
 
 	// Create the sprite that will be displayed on window
 	sf::Image render_image;
@@ -165,12 +161,6 @@ void spheresScene() {
 		Vec3(0.0, -5001.0, 0.0), 5000.0);
 	std::shared_ptr<Sphere> light_sphere0_body = std::make_shared<Sphere>(
 		Vec3(-4.0, 10.0, -0.0), 1.0);
-	//std::shared_ptr<Quad> red_Quad0_body = std::make_shared<Quad>(
-	//	Vec3(-2.0, 1.0, 6.0), Vec3(0.0, 1.0, -1.0), Vec3(1.0, 0.0, 0.0));
-	//std::shared_ptr<triangle> red_tri0_body = std::make_shared<triangle>(
-	//	Vec3(-2.0, 1.0, 6.0), Vec3(0.0, 1.0, -1.0), Vec3(1.0, 0.0, 0.0));
-	std::shared_ptr<Cube> red_cub0_body = std::make_shared<Cube>(
-		Vec3(-2.0, -1.0, 0.0), 1.0);
 
 	// Add objects to the scene
 	hittables.push_back(std::make_shared<Hittable>(
@@ -183,8 +173,6 @@ void spheresScene() {
 		red_sphere1_body, red_diffuse));
 	hittables.push_back(std::make_shared<Hittable>(
 		yellow_sphere0_body, yellow_diffuse));
-	hittables.push_back(std::make_shared<Hittable>(
-		red_cub0_body, blue_diffuse));
 
 	// Lights
 	hittables.push_back(std::make_shared<Hittable>(
@@ -208,9 +196,8 @@ void cornellBox() {
 	std::shared_ptr<Quad> wall4 = std::make_shared<Quad>(Vec3(0, 0, 2), Vec3(2, 0, 0), Vec3(0, 2, 0));
 	std::shared_ptr<Quad> light_body = std::make_shared<Quad>(Vec3(1.24, 1.99, 1.22), Vec3(-0.47, 0, 0), Vec3(0, 0, -0.38));
 
-	std::shared_ptr<Sphere> left_sphere = std::make_shared<Sphere>(Vec3(0.5, 0.5, 1.0), 0.4);
+	std::shared_ptr<Sphere> left_sphere = std::make_shared<Sphere>(Vec3(0.5, 0.4, 1.0), 0.4);
 
-	//addCuboid(Vec3(0.2, 0.0, 1.0), Vec3(0.5, 0.5, 0.5), 60.0, white, hittables);
 	addCuboid(Vec3(1.5, 0.0, 0.5), Vec3(0.5, 0.5, 0.5), -45.0, white, hittables);
 
 	hittables.push_back(std::make_shared<Hittable>(
@@ -229,30 +216,38 @@ void cornellBox() {
 		left_sphere, glass));
 }
 
-void singleBox() {
-	std::shared_ptr<Diffuse> yellow_diffuse = std::make_shared<Diffuse>(
-		Colour(0.85, 0.85, 0.0));
+void cornellBoxMeshObj() {
+	std::shared_ptr<Diffuse> red = std::make_shared<Diffuse>(Colour(0.65, 0.05, 0.05));
 	std::shared_ptr<Diffuse> white = std::make_shared<Diffuse>(Colour(0.73, 0.73, 0.73));
+	std::shared_ptr<Diffuse> green = std::make_shared<Diffuse>(Colour(0.12, 0.45, 0.15));
+	std::shared_ptr<Diffuse> blue_diffuse = std::make_shared<Diffuse>(
+	Colour(0.1, 0.0, 0.85));
+	std::shared_ptr<Dielectric> glass = std::make_shared<Dielectric>(Colour(1.0, 1.0, 1.0), 1.4);
+	std::shared_ptr<Light> white_light = std::make_shared<Light>(Colour(15, 15, 15));
 
-	std::shared_ptr<Sphere> yellow_sphere0_body = std::make_shared<Sphere>(
-	Vec3(0.0, -5001.0, 0.0), 5000.0);
+	std::shared_ptr<Quad> wall0 = std::make_shared<Quad>(Vec3(2, 0, 0), Vec3(0, 2, 0), Vec3(0, 0, 2));
+	std::shared_ptr<Quad> wall1 = std::make_shared<Quad>(Vec3(0, 0, 0), Vec3(0, 2, 0), Vec3(0, 0, 2));
+	// world.add(make_shared<Quad>(point3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), red));
+	std::shared_ptr<Quad> wall2 = std::make_shared<Quad>(Vec3(2, 2, 2), Vec3(-2, 0, 0), Vec3(0, 0, -2));
+	// world.add(make_shared<Quad>(point3(555, 555, 555), Vec3(-555, 0, 0), Vec3(0, 0, -555), white));
+	std::shared_ptr<Quad> wall3 = std::make_shared<Quad>(Vec3(0, 0, 0), Vec3(2, 0, 0), Vec3(0, 0, 2));
+	std::shared_ptr<Quad> wall4 = std::make_shared<Quad>(Vec3(0, 0, 2), Vec3(2, 0, 0), Vec3(0, 2, 0));
+	std::shared_ptr<Quad> light_body = std::make_shared<Quad>(Vec3(1.24, 1.99, 1.22), Vec3(-0.47, 0, 0), Vec3(0, 0, -0.38));
 
-	Vec3 u(1.0, 0.0, 0.0);
-	Vec3 v(0.0, 1.0, 0.0);
-	Vec3 w(0.0, 0.0, 1.0);
-	double angle = 60.0;
-
-	std::shared_ptr<Cube> block0 = std::make_shared<Cube>(
-		Vec3(1.0, 0.0, 1.0),
-		u.y_rotation(angle),
-		v.y_rotation(angle),
-		w.y_rotation(angle),
-		0.7);
+	loadObj(hittables, glass, Vec3(0.7, 0.5, 0.5));
 
 	hittables.push_back(std::make_shared<Hittable>(
-		yellow_sphere0_body, yellow_diffuse));
+		wall0, green));
 	hittables.push_back(std::make_shared<Hittable>(
-		block0, white));
+		wall1, red));
+	hittables.push_back(std::make_shared<Hittable>(
+		wall2, white));
+	hittables.push_back(std::make_shared<Hittable>(
+		wall3, white));
+	hittables.push_back(std::make_shared<Hittable>(
+		wall4, white));
+	hittables.push_back(std::make_shared<Hittable>(
+		light_body, white_light));
 }
 
 void addCuboid(
@@ -316,17 +311,6 @@ Colour traceRay(
 	double t = 0.0;
 	std::shared_ptr<Hittable> closest_hittable = nullptr;
 	
-	/*
-	for (std::shared_ptr<Hittable> hittable : hittables) {
-		if (hittable->hit(r, t_range, t)) {
-			if (t < closest_t) {
-				closest_t = t;
-				closest_hittable = hittable;
-			}
-		}
-	}
-	*/
-	
 	closest_hittable = hittable_tree.hit(r, t_range, closest_t);
 
 	if (closest_hittable == nullptr) {
@@ -344,4 +328,73 @@ Colour traceRay(
 	}
 
 	return hit_colour * traceRay(scattered, hittable_tree, t_range, depth + 1);
+}
+
+void loadObj(
+	std::vector<std::shared_ptr<Hittable>>& hittable_list,
+	std::shared_ptr<Material> mat,
+	const Vec3& position_offset) {
+
+	std::string file_name = "cow.obj";
+	double scale_factor = 0.1;
+
+	std::ifstream myfile(file_name);
+	std::vector<double> vertices;
+	std::vector<std::vector<double>> triangles;
+
+	if (myfile.is_open()) {
+		std::string str;
+		int v1;
+		int v2;
+		int v3;
+		std::string temp;
+
+		while (std::getline(myfile, str)) {
+			std::stringstream ss(str);
+			ss >> temp;
+
+			if (temp == "v") {
+				ss >> temp;
+				vertices.push_back(std::stod(temp));
+				ss >> temp;
+				vertices.push_back(std::stod(temp));
+				ss >> temp;
+				vertices.push_back(std::stod(temp));
+			}
+
+			if (temp == "f") {
+				ss >> temp;
+				v1 = std::stoi(temp);
+				ss >> temp;
+				v2 = std::stoi(temp);
+				ss >> temp;
+				v3 = std::stoi(temp);
+
+				triangles.push_back({vertices[3 * (v1 - 1)] * scale_factor,
+									 vertices[3 * (v1 - 1) + 1] * scale_factor,
+									 vertices[3 * (v1 - 1) + 2] * scale_factor,
+									 vertices[3 * (v2 - 1)] * scale_factor,
+									 vertices[3 * (v2 - 1) + 1] * scale_factor,
+									 vertices[3 * (v2 - 1) + 2] * scale_factor,
+									 vertices[3 * (v3 - 1)] * scale_factor,
+									 vertices[3 * (v3 - 1) + 1] * scale_factor,
+									 vertices[3 * (v3 - 1) + 2] * scale_factor});
+			}
+		}
+		myfile.close();
+	}
+	else {
+		std::cout << "Unable to open file" << std::endl;
+		return;
+	}
+
+	for (size_t i = 0; i < triangles.size(); ++i) {
+		std::shared_ptr<Triangle> triangle = std::make_shared<Triangle>(
+						Vec3(triangles[i][0], triangles[i][1], triangles[i][2]) + position_offset,
+						Vec3(triangles[i][3], triangles[i][4], triangles[i][5]) + position_offset,
+						Vec3(triangles[i][6], triangles[i][7], triangles[i][8]) + position_offset);
+
+		hittable_list.push_back(std::make_shared<Hittable>(triangle, mat));
+	}
+	std::cout << "Triangles added: " << hittable_list.size() << std::endl;
 }

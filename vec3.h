@@ -62,7 +62,7 @@ Vec3 refract(const Vec3& d, const Vec3& n, const double rindexin_over_rindexout)
 
 const double pi = 3.141592;
 
-// Not strictly Vec3
+// Code below is not strictly Vec3. Consider moving to another file
 static std::random_device rd;
 
 int random_int(int a, int b);
@@ -74,6 +74,6 @@ double absolute(const double& a);
 double gammaCorrection(double linear);
 
 const double big = std::numeric_limits<double>::infinity();
-const double small = 0.001;
+const double small = 0.00001;
 
 using Colour = Vec3;

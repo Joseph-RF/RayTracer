@@ -63,7 +63,7 @@ private:
 class Triangle : public Shape
 {
 public:
-	Triangle(const Vec3& Q, const Vec3& u, const Vec3& v);
+	Triangle(const Vec3& v1, const Vec3& v2, const Vec3& v3);
 
 	bool hit(Ray& r, Interval t_range, double& t) override;
 	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
@@ -73,40 +73,11 @@ public:
 	void bounding_box();
 
 private:
-	Vec3 Q;
-	Vec3 u;
-	Vec3 v;
 	AABB bbox;
 
 	std::vector<Vec3> vertices = std::vector<Vec3>(3);
 
 	Vec3 normal;
-};
-
-class Cube : public Shape
-{
-public:
-	Cube(const Vec3& Q, const double length);
-	Cube(const Vec3& Q, const Vec3& u,
-		 const Vec3& v, const Vec3& w,
-		 const double length);
-
-	bool hit(Ray& r, Interval t_range, double& t) override;
-	void scatter(Ray& r_in, double t, Vec3& p, Vec3& n) override;
-
-	AABB get_bounding_box() override;
-
-	void bounding_box();
-
-private:
-	Vec3 Q;
-	double length;
-	AABB bbox;
-	
-	std::vector<Quad> faces = std::vector<Quad>(6);
-	// Used to pass the information from hit function to scatter function
-	//which face was hit by the Ray of light
-	int face_hit;
 };
 
 bool interior(const std::vector<Vec3>& vertices, const Vec3& p);
