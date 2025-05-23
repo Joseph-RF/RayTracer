@@ -15,69 +15,69 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RayTracer.cpp">
+    <ClCompile Include="src\aabb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vec3.cpp">
+    <ClCompile Include="src\bvhnode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shape.cpp">
+    <ClCompile Include="src\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pixelmap.cpp">
+    <ClCompile Include="src\hittable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ray.cpp">
+    <ClCompile Include="src\interval.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="material.cpp">
+    <ClCompile Include="src\material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hittable.cpp">
+    <ClCompile Include="src\pixelmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="camera.cpp">
+    <ClCompile Include="src\ray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="interval.cpp">
+    <ClCompile Include="src\RayTracer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="aabb.cpp">
+    <ClCompile Include="src\shape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bvhnode.cpp">
+    <ClCompile Include="src\vec3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="vec3.h">
+    <ClInclude Include="src\aabb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shape.h">
+    <ClInclude Include="src\bvhnode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pixelmap.h">
+    <ClInclude Include="src\camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ray.h">
+    <ClInclude Include="src\hittable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="material.h">
+    <ClInclude Include="src\interval.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hittable.h">
+    <ClInclude Include="src\material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="camera.h">
+    <ClInclude Include="src\pixelmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="interval.h">
+    <ClInclude Include="src\ray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="aabb.h">
+    <ClInclude Include="src\shape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bvhnode.h">
+    <ClInclude Include="src\vec3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

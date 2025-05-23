@@ -143,29 +143,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="aabb.cpp" />
-    <ClCompile Include="bvhnode.cpp" />
-    <ClCompile Include="camera.cpp" />
-    <ClCompile Include="hittable.cpp" />
-    <ClCompile Include="interval.cpp" />
-    <ClCompile Include="material.cpp" />
-    <ClCompile Include="pixelmap.cpp" />
-    <ClCompile Include="ray.cpp" />
-    <ClCompile Include="RayTracer.cpp" />
-    <ClCompile Include="shape.cpp" />
-    <ClCompile Include="vec3.cpp" />
+    <ClCompile Include="src\aabb.cpp" />
+    <ClCompile Include="src\bvhnode.cpp" />
+    <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\hittable.cpp" />
+    <ClCompile Include="src\interval.cpp" />
+    <ClCompile Include="src\material.cpp" />
+    <ClCompile Include="src\pixelmap.cpp" />
+    <ClCompile Include="src\ray.cpp" />
+    <ClCompile Include="src\RayTracer.cpp" />
+    <ClCompile Include="src\shape.cpp" />
+    <ClCompile Include="src\vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="aabb.h" />
-    <ClInclude Include="bvhnode.h" />
-    <ClInclude Include="camera.h" />
-    <ClInclude Include="hittable.h" />
-    <ClInclude Include="interval.h" />
-    <ClInclude Include="material.h" />
-    <ClInclude Include="pixelmap.h" />
-    <ClInclude Include="ray.h" />
-    <ClInclude Include="shape.h" />
-    <ClInclude Include="vec3.h" />
+    <ClInclude Include="src\aabb.h" />
+    <ClInclude Include="src\bvhnode.h" />
+    <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\hittable.h" />
+    <ClInclude Include="src\interval.h" />
+    <ClInclude Include="src\material.h" />
+    <ClInclude Include="src\pixelmap.h" />
+    <ClInclude Include="src\ray.h" />
+    <ClInclude Include="src\shape.h" />
+    <ClInclude Include="src\vec3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
