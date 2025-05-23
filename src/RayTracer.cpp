@@ -335,7 +335,8 @@ void loadObj(
 	std::shared_ptr<Material> mat,
 	const Vec3& position_offset) {
 
-	std::string file_name = "cow.obj";
+	// Root directory of project is in /vs/
+	std::string file_name = "..\\cow.obj";
 	double scale_factor = 0.1;
 
 	std::ifstream myfile(file_name);

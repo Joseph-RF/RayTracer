@@ -102,6 +102,7 @@ StyleCopReport.xml
 *.vcxproj
 *.vcxproj.filters
 *.png
+/vs/
 
 # Chutzpah Test files
 _Chutzpah*
