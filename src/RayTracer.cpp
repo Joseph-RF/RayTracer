@@ -316,7 +316,7 @@ Colour traceRay(
 	if (closest_hittable == nullptr) {
 		// Colour of the background / sky
 		//return Colour(0.0, 0.0, 0.0);
-		return Colour(0.7, 0.9, 1.0) * 0.8;
+		return Colour(0.7, 0.9, 1.0) * 0.2;
 		//return Colour(0.1, 0.1, 0.1);
 	}
 	

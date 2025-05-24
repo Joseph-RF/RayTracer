@@ -15,6 +15,6 @@ Camera::Camera()
 	u = cross(lookup, w).normalise();
 	v = cross(w, u);
 
-	pixel_samples = 10;
+	pixel_samples = 100;
 	pixel_sampling_factor = 1.0 / pixel_samples;
 }
