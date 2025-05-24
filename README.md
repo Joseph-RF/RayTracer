@@ -38,11 +38,11 @@ Raytracing program based on the [Ray Tracing in One Weekend](https://raytracing.
 
 The raytracer supports spheres, quads (quadrilateral) and triangles. Using the latter together with a .obj loading function, the following render was made:
 
-<img src="/READMEImages/cornell_box_glass_ball.png>" alt="Image of a cornell box with a glass cow sitting inside." width="750"/>
+<img src="/READMEImages/cornell_box_glass_ball.png" alt="Image of a cornell box with a glass cow sitting inside." width="750"/>
 
 Here is a more standard version of the Cornell Box:
 
-<img src="/READMEImages/cornell_box_glass_sphere.png>" alt="Image of a cornell box with a glass cow sitting inside." width="750"/>
+<img src="/READMEImages/cornell_box_glass_sphere.png" alt="Image of a cornell box with a glass cow sitting inside." width="750"/>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
