@@ -101,7 +101,7 @@ StyleCopReport.xml
 # Added by user
 *.vcxproj
 *.vcxproj.filters
-*.png
+render.png
 /vs/
 
 # Chutzpah Test files
